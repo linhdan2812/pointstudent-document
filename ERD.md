@@ -131,16 +131,18 @@ erDiagram
 |---|---|---|---|---|
 | `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính |
 | `name` | VARCHAR(255) | NOT NULL | - | Tên trường học |
+| `school_code` | VARCHAR(50) | NOT NULL | UQ | Mã trường – duy nhất toàn hệ thống, Admin System tự nhập |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
 
-> **Lưu ý:** BRD không đề cập chi tiết các trường dữ liệu của trường học (địa chỉ, mã trường, số điện thoại...). Bảng trên chỉ bao gồm trường `name` là tối thiểu cần thiết. Dev cần confirm thêm field với stakeholder nếu cần.
-
 **Constraints:**
 - `PK`: `id`
+- `UQ`: `school_code` (mã trường unique toàn hệ thống)
 
 **Business Rules liên quan:**
 - BR-002-01: Khi INSERT vào `schools` → trigger tạo 1 record trong `users` với role = `admin_school` và `school_id` = id trường vừa tạo
+- BR-002-02: `school_code` UNIQUE toàn hệ thống
+- BR-002-03: `school_code` do Admin System tự nhập
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin adminstpoint@gmail.com / adminstpoiNt1122@ là của Admin System, không phải Admin School. **Cần làm rõ cơ chế generate tài khoản Admin School với stakeholder.**
 
@@ -632,7 +634,7 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 
 | STT | Nội dung | Trạng thái |
 |---|---|---|
-| 1 | Bảng `schools` thiếu field chi tiết | Chưa rõ – cần confirm stakeholder |
+| ~~1~~ | ~~Bảng `schools` thiếu field chi tiết~~ | **Đã giải đáp:** Thêm `school_code` (mã trường, unique, tự nhập) |
 | ~~2~~ | ~~Enum `work_status`, `study_status` chưa có giá trị cụ thể~~ | **Đã giải đáp:** `work_status`: active/resigned. `study_status`: studying/dropped_out |
 | 3 | Enum `gender` chưa có giá trị cụ thể | Chưa rõ – gợi ý male/female/other |
 | 4 | Thang điểm (`scores.value`) chưa xác định | Chưa rõ – BRD không đề cập (0-10 hay 0-100) |

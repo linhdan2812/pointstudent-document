@@ -180,9 +180,10 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 **Input Data:**
 
-| Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
-|---|---|---|---|
-| Thông tin trường học | - | - | BRD không đề cập chi tiết các trường dữ liệu của trường học |
+| Trường | Kiểu dữ liệu | Bắt buộc | Unique | Mô tả |
+|---|---|---|---|---|
+| Tên trường | String | Có | Không | Tên trường học |
+| Mã trường | String | Có | Có | Mã trường học, Admin System có thể tự nhập |
 
 **Output Data:**
 - Danh sách trường học
@@ -192,19 +193,25 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 | STT | Rule | Mô tả |
 |---|---|---|
-| VR-002-01 | Thông tin trường học hợp lệ | BRD không đề cập chi tiết validation |
+| VR-002-01 | Tên trường không được để trống | Bắt buộc |
+| VR-002-02 | Mã trường không được để trống | Bắt buộc |
+| VR-002-03 | Mã trường phải duy nhất trong hệ thống | Unique constraint |
 
 **Message Validation:**
 
 | Code | Message | Điều kiện |
 |---|---|---|
-| MSG-002-01 | BRD không đề cập | - |
+| MSG-002-01 | "Vui lòng nhập tên trường" | Tên trường để trống |
+| MSG-002-02 | "Vui lòng nhập mã trường" | Mã trường để trống |
+| MSG-002-03 | "Mã trường đã tồn tại trong hệ thống" | Mã trường trùng |
 
 **Business Rules:**
 
 | STT | Rule |
 |---|---|
 | BR-002-01 | Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó |
+| BR-002-02 | Mã trường là duy nhất (unique) trên toàn hệ thống |
+| BR-002-03 | Mã trường do Admin System tự nhập |
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin đăng nhập adminstpoint@gmail.com / adminstpoiNt1122@ là tài khoản của Admin System, không phải Admin School. **Cần làm rõ cơ chế tạo tài khoản Admin School với stakeholder.**
 
@@ -212,7 +219,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 | STT | Exception | Xử lý |
 |---|---|---|
-| EX-002-01 | Trường học trùng lặp | BRD không đề cập |
+| EX-002-01 | Mã trường trùng | Hiển thị MSG-002-03, không cho phép lưu |
 | EX-002-02 | Không thể tạo tài khoản Admin School | BRD không đề cập |
 
 ---
@@ -1167,7 +1174,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 | ~~Q-007~~ | ~~Công thức tính ĐTB chính xác?~~ | **Đã giải đáp:** ĐTB = Tổng(Điểm × Hệ số) / Tổng Hệ số |
 | Q-008 | Kênh gửi thông báo nhận xét: in-app, email, SMS? | Chưa rõ |
 | Q-009 | Có chức năng xóa cho giáo viên, học sinh, lớp, điểm không? | Chưa rõ |
-| Q-010 | Chi tiết các trường dữ liệu của trường học (entity School)? | Chưa rõ |
+| ~~Q-010~~ | ~~Chi tiết các trường dữ liệu của trường học (entity School)?~~ | **Đã giải đáp:** Tên trường, Mã trường (unique, tự nhập) |
 | ~~Q-011~~ | ~~Dòng "indicate." ở mục 4.3.2 có ý nghĩa gì?~~ | **Đã giải đáp:** Xem bảng điểm chi tiết của từng học sinh |
 
 ---

@@ -76,10 +76,15 @@ Hệ thống bao gồm:
 
 ## 4.1.2 Quản lý trường học
 
+### Thông tin
+- Tên trường
+- Mã trường (Unique, có thể tự nhập)
+
 ### Chức năng
 - CRUD trường học
 
 ### Quy tắc nghiệp vụ
+- Mã trường là duy nhất trong hệ thống, Admin System có thể tự nhập
 - Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó
 
 ---
