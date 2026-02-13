@@ -221,6 +221,7 @@ erDiagram
 | `school_id` | FK → schools.id | NOT NULL | - | Trường đang công tác |
 | `full_name` | VARCHAR(255) | NOT NULL | - | Họ và tên |
 | `date_of_birth` | DATE | NOT NULL | - | Ngày sinh |
+| `address` | VARCHAR(500) | NOT NULL | - | Địa chỉ |
 | `citizen_id` | VARCHAR(20) | NOT NULL | UQ | Số CCCD – duy nhất toàn hệ thống |
 | `teacher_code` | VARCHAR(50) | NOT NULL | UQ | Mã số giáo viên – duy nhất toàn hệ thống |
 | `gender` | ENUM | NOT NULL | - | Giới tính |

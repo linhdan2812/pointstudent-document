@@ -364,6 +364,7 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 |---|---|---|---|---|
 | Họ tên | String | Có | Không | Họ và tên giáo viên |
 | Ngày sinh | Date | Có | Không | Ngày sinh |
+| Địa chỉ | String | Có | Không | Địa chỉ giáo viên |
 | CCCD | String | Có | Có | Số căn cước công dân |
 | Mã số giáo viên | String | Có | Có | Mã định danh giáo viên |
 | Giới tính | Enum | Có | Không | Giới tính |
@@ -381,12 +382,13 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 |---|---|---|
 | VR-005-01 | Họ tên không được để trống | Bắt buộc |
 | VR-005-02 | Ngày sinh không được để trống | Bắt buộc |
-| VR-005-03 | CCCD không được để trống | Bắt buộc |
-| VR-005-04 | CCCD phải duy nhất trong hệ thống | Unique constraint |
-| VR-005-05 | Mã số giáo viên không được để trống | Bắt buộc |
-| VR-005-06 | Mã số giáo viên phải duy nhất trong hệ thống | Unique constraint |
-| VR-005-07 | Email không được để trống và đúng định dạng | Bắt buộc |
-| VR-005-08 | Mật khẩu không được để trống | Bắt buộc |
+| VR-005-03 | Địa chỉ không được để trống | Bắt buộc |
+| VR-005-04 | CCCD không được để trống | Bắt buộc |
+| VR-005-05 | CCCD phải duy nhất trong hệ thống | Unique constraint |
+| VR-005-06 | Mã số giáo viên không được để trống | Bắt buộc |
+| VR-005-07 | Mã số giáo viên phải duy nhất trong hệ thống | Unique constraint |
+| VR-005-08 | Email không được để trống và đúng định dạng | Bắt buộc |
+| VR-005-09 | Mật khẩu không được để trống | Bắt buộc |
 
 **Message Validation:**
 
@@ -394,13 +396,14 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 |---|---|---|
 | MSG-005-01 | "Vui lòng nhập họ tên" | Họ tên để trống |
 | MSG-005-02 | "Vui lòng nhập ngày sinh" | Ngày sinh để trống |
-| MSG-005-03 | "Vui lòng nhập số CCCD" | CCCD để trống |
-| MSG-005-04 | "Số CCCD đã tồn tại trong hệ thống" | CCCD trùng |
-| MSG-005-05 | "Vui lòng nhập mã số giáo viên" | Mã số để trống |
-| MSG-005-06 | "Mã số giáo viên đã tồn tại trong hệ thống" | Mã số trùng |
-| MSG-005-07 | "Vui lòng nhập email" | Email để trống |
-| MSG-005-08 | "Email không đúng định dạng" | Email sai format |
-| MSG-005-09 | "Vui lòng nhập mật khẩu" | Mật khẩu để trống |
+| MSG-005-03 | "Vui lòng nhập địa chỉ" | Địa chỉ để trống |
+| MSG-005-04 | "Vui lòng nhập số CCCD" | CCCD để trống |
+| MSG-005-05 | "Số CCCD đã tồn tại trong hệ thống" | CCCD trùng |
+| MSG-005-06 | "Vui lòng nhập mã số giáo viên" | Mã số để trống |
+| MSG-005-07 | "Mã số giáo viên đã tồn tại trong hệ thống" | Mã số trùng |
+| MSG-005-08 | "Vui lòng nhập email" | Email để trống |
+| MSG-005-09 | "Email không đúng định dạng" | Email sai format |
+| MSG-005-10 | "Vui lòng nhập mật khẩu" | Mật khẩu để trống |
 
 **Business Rules:**
 

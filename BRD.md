@@ -114,6 +114,7 @@ Hệ thống bao gồm:
 ### Thông tin
 - Họ tên
 - Ngày sinh
+- Địa chỉ
 - CCCD (Unique)
 - Mã số giáo viên (Unique)
 - Giới tính
