@@ -146,6 +146,8 @@ Hệ thống bao gồm:
 - Ngày sinh cha
 - Họ tên mẹ
 - Nghề nghiệp mẹ
+- Ngày sinh mẹ
+- Số điện thoại mẹ
 - Email đăng nhập
 - Số điện thoại
 - Mật khẩu

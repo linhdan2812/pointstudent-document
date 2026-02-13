@@ -471,11 +471,13 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | Ngày sinh cha | Date | Có | Ngày sinh người cha |
 | Họ tên mẹ | String | Có | Họ tên người mẹ |
 | Nghề nghiệp mẹ | String | Có | Nghề nghiệp người mẹ |
+| Ngày sinh mẹ | Date | Có | Ngày sinh người mẹ |
+| Số điện thoại mẹ | String | Có | Số điện thoại người mẹ |
 | Email đăng nhập | String (Email) | Có | Email để phụ huynh đăng nhập |
-| Số điện thoại | String | Có | Số điện thoại liên lạc |
+| Số điện thoại | String | Có | Số điện thoại liên lạc chung |
 | Mật khẩu | String | Có | Mật khẩu đăng nhập |
 
-> **Lưu ý:** BRD không đề cập ngày sinh mẹ, nhưng có ngày sinh cha. Cũng không rõ "Bắt buộc" hay "Không bắt buộc" cho từng trường. Các trường trên được suy luận là bắt buộc do BRD liệt kê chúng. **Cần xác nhận lại với stakeholder.**
+> **Lưu ý:** Không rõ "Bắt buộc" hay "Không bắt buộc" cho từng trường. Các trường trên được suy luận là bắt buộc do BRD liệt kê chúng. **Cần xác nhận lại với stakeholder.**
 
 **Output Data:**
 - Danh sách học sinh (có trạng thái)
