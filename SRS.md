@@ -7,10 +7,10 @@
 | Mục | Nội dung |
 |---|---|
 | Tên dự án | Hệ thống Quản lý điểm học sinh |
-| Tài liệu tham chiếu | BRD v1.0 – Ngày 12/02/2026 |
+| Tài liệu tham chiếu | BRD v1.1 – Ngày 13/02/2026 |
 | Người soạn | Senior Business Analyst |
 | Ngày tạo | 13/02/2026 |
-| Phiên bản | 1.0 |
+| Phiên bản | 1.1 |
 
 ---
 
@@ -135,6 +135,7 @@ Hệ thống cho phép người dùng đăng nhập bằng email và mật khẩ
 |---|---|
 | BR-001-01 | Hệ thống phân quyền chức năng dựa trên role của tài khoản |
 | BR-001-02 | Mỗi tài khoản được gắn với đúng 1 role |
+| BR-001-03 | Tài khoản Admin System mặc định: Email: adminstpoint@gmail.com, Password: adminstpoiNt1122@ |
 
 **Exception Handling:**
 
@@ -160,7 +161,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 2. Nhập thông tin trường học
 3. Hệ thống validate dữ liệu
 4. Hệ thống lưu thông tin trường học
-5. Hệ thống tự động tạo tài khoản Admin School với thông tin mặc định
+5. Hệ thống tự động tạo tài khoản Admin School theo trường học đó
 6. Hiển thị thông báo thành công
 
 *Xem danh sách trường học:*
@@ -203,10 +204,9 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 | STT | Rule |
 |---|---|
-| BR-002-01 | Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School |
-| BR-002-02 | Tài khoản Admin School mặc định: Email: adminstpoint@gmail.com, Password: adminstpoiNt1122@ |
+| BR-002-01 | Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó |
 
-> **Lưu ý:** BRD ghi nhận email/password mặc định là cố định (adminstpoint@gmail.com / adminstpoiNt1122@). Cần làm rõ: nếu tạo nhiều trường, tất cả Admin School đều dùng cùng email này hay email được generate theo quy tắc riêng. **BRD không đề cập.**
+> **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin đăng nhập adminstpoint@gmail.com / adminstpoiNt1122@ là tài khoản của Admin System, không phải Admin School. **Cần làm rõ cơ chế tạo tài khoản Admin School với stakeholder.**
 
 **Exception Handling:**
 
@@ -367,7 +367,7 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 | CCCD | String | Có | Có | Số căn cước công dân |
 | Mã số giáo viên | String | Có | Có | Mã định danh giáo viên |
 | Giới tính | Enum | Có | Không | Giới tính |
-| Trạng thái làm việc | Enum | Có | Không | Trạng thái hiện tại |
+| Trạng thái làm việc | Enum | Có | Không | Đang làm việc / Đã nghỉ |
 | Email | String (Email) | Có | Không | Email đăng nhập hệ thống |
 | Mật khẩu | String | Có | Không | Mật khẩu đăng nhập |
 
@@ -410,7 +410,7 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 | BR-005-02 | Mã số giáo viên phải là duy nhất (unique) trên toàn hệ thống |
 | BR-005-03 | Giáo viên được tạo tài khoản đăng nhập bằng email và mật khẩu |
 
-> **Lưu ý:** BRD không đề cập các giá trị cụ thể của "Trạng thái làm việc" và "Giới tính". Cũng không đề cập chức năng xóa giáo viên. **BRD không đề cập.**
+> **Lưu ý:** BRD không đề cập các giá trị cụ thể của "Giới tính". Cũng không đề cập chức năng xóa giáo viên. **BRD không đề cập.**
 
 **Exception Handling:**
 
@@ -457,7 +457,7 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | Giới tính | Enum | Có | Giới tính |
 | Email đăng nhập | String (Email) | Có | Email để đăng nhập hệ thống |
 | Mật khẩu | String | Có | Mật khẩu đăng nhập |
-| Trạng thái học | Enum | Có | Trạng thái học tập |
+| Trạng thái học | Enum | Có | Đang học / Đã nghỉ |
 
 *Thông tin phụ huynh:*
 
@@ -510,7 +510,7 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | BR-006-03 | Phụ huynh có tài khoản riêng để đăng nhập hệ thống |
 | BR-006-04 | Học sinh có tài khoản riêng để đăng nhập hệ thống |
 
-> **Lưu ý:** BRD không đề cập các giá trị cụ thể của "Trạng thái học" (ngoài "Đang học" được nhắc đến ở mục quản lý danh sách học sinh trong lớp). **BRD không đề cập đầy đủ.**
+> **Lưu ý:** Trạng thái học gồm 2 giá trị: "Đang học" và "Đã nghỉ".
 
 **Exception Handling:**
 
@@ -578,7 +578,7 @@ Admin School quản lý danh sách lớp học theo năm học. Mỗi lớp có 
 
 | STT | Exception | Xử lý |
 |---|---|---|
-| EX-007-01 | Trùng tên lớp | Hiển thị MSG-007-02, không cho phép lưu |
+| EX-007-01 | Trùng tên lớp | Hiển thị thông báo lỗi (MSG-007-02), tạo lớp không thành công |
 | EX-007-02 | GVCN đã được gán lớp khác | Không hiển thị trong dropdown (BR-007-03) |
 | EX-007-03 | Xóa lớp đã có học sinh | BRD không đề cập |
 
@@ -587,16 +587,17 @@ Admin School quản lý danh sách lớp học theo năm học. Mỗi lớp có 
 ### FR-008: Quản lý danh sách học sinh trong lớp
 
 **Mô tả chức năng:**
-Admin School thêm học sinh vào lớp học thông qua popup chọn học sinh. Chỉ những học sinh có trạng thái "Đang học" mới được hiển thị để chọn. Mỗi học sinh chỉ thuộc 1 lớp trong cùng năm học.
+Trong chi tiết lớp học, có mục danh sách học sinh. Admin School thêm học sinh vào lớp thông qua popup với checkbox. Chỉ những học sinh có trạng thái "Đang học" mới được hiển thị. Mỗi học sinh chỉ thuộc 1 lớp trong cùng năm học.
 
 **Actor:** Admin School
 
 **Business Flow:**
-1. Admin School truy cập chi tiết lớp học
-2. Chọn chức năng thêm học sinh
+1. Admin School truy cập chi tiết lớp học, xem mục danh sách học sinh
+2. Nhấn nút "Chỉnh sửa danh sách học sinh"
 3. Hệ thống hiển thị popup danh sách học sinh khả dụng (trạng thái "Đang học", chưa thuộc lớp nào trong năm học)
-4. Admin School chọn học sinh cần thêm
-5. Hệ thống lưu và cập nhật danh sách
+4. Admin School tick checkbox chọn học sinh cần thêm
+5. Nhấn nút "Thêm vào lớp"
+6. Hệ thống lưu và cập nhật danh sách
 
 **Input Data:**
 
@@ -627,7 +628,7 @@ Admin School thêm học sinh vào lớp học thông qua popup chọn học sin
 |---|---|
 | BR-008-01 | 1 học sinh chỉ thuộc 1 lớp trong cùng năm học |
 | BR-008-02 | Chỉ hiển thị học sinh có trạng thái "Đang học" trong popup |
-| BR-008-03 | Thêm học sinh thông qua giao diện popup |
+| BR-008-03 | Thêm học sinh thông qua giao diện popup với checkbox chọn nhiều, sau đó nhấn nút "Thêm vào lớp" |
 
 **Exception Handling:**
 
@@ -641,16 +642,18 @@ Admin School thêm học sinh vào lớp học thông qua popup chọn học sin
 ### FR-009: Phân công giáo viên bộ môn
 
 **Mô tả chức năng:**
-Admin School phân công giáo viên bộ môn cho từng lớp. Chọn môn học cần thêm và chọn giáo viên phụ trách môn đó cho lớp.
+Trong chi tiết lớp học, có nút "Thông tin giáo viên bộ môn". Khi click, hiển thị trang mới với danh sách phân công dạng bảng 2 cột (Tên môn học – Giáo viên phụ trách). Admin School chọn môn và giáo viên qua droplist.
 
 **Actor:** Admin School
 
 **Business Flow:**
 1. Admin School truy cập chi tiết lớp học
-2. Chọn chức năng phân công giáo viên bộ môn
-3. Thêm môn học từ danh sách môn học của năm học
-4. Chọn giáo viên phụ trách cho môn đó
-5. Hệ thống lưu phân công
+2. Nhấn nút "Thông tin giáo viên bộ môn"
+3. Hệ thống hiển thị trang mới với danh sách phân công gồm 2 cột: Tên môn học và Giáo viên phụ trách
+4. Tại cột Tên môn học: droplist hiển thị danh sách môn học của năm học đó
+5. Tại cột Giáo viên: droplist hiển thị danh sách giáo viên để chọn
+6. Khi cần thêm dòng phân công mới, nhấn nút "Thêm mới"
+7. Hệ thống lưu phân công
 
 **Input Data:**
 
@@ -682,6 +685,8 @@ Admin School phân công giáo viên bộ môn cho từng lớp. Chọn môn h�
 | STT | Rule |
 |---|---|
 | BR-009-01 | Mỗi lớp có danh sách môn học và giáo viên phụ trách tương ứng |
+| BR-009-02 | Giao diện hiển thị dạng danh sách 2 cột với droplist chọn môn và giáo viên |
+| BR-009-03 | Có nút "Thêm mới" để thêm dòng phân công |
 
 > **Lưu ý:** BRD không đề cập các ràng buộc: 1 giáo viên dạy tối đa bao nhiêu lớp, 1 môn trong 1 lớp có tối đa mấy giáo viên, giáo viên có phải dạy đúng chuyên môn không. **BRD không đề cập.**
 
@@ -737,23 +742,29 @@ Giáo viên sau khi đăng nhập sẽ thấy dashboard hiển thị danh sách 
 
 ---
 
-### FR-011: Lớp chủ nhiệm – Xem bảng điểm trung bình
+### FR-011: Lớp chủ nhiệm – Xem bảng điểm
 
 **Mô tả chức năng:**
-Giáo viên chủ nhiệm xem bảng điểm trung bình tất cả các môn của học sinh trong lớp chủ nhiệm.
+Giáo viên chủ nhiệm xem bảng điểm trung bình tất cả các môn của học sinh trong lớp. Ngoài ra có thể click vào từng học sinh để xem bảng điểm chi tiết.
 
 **Actor:** Giáo viên (vai trò GVCN)
 
 **Business Flow:**
+
+*Xem bảng điểm trung bình:*
 1. Giáo viên chọn lớp chủ nhiệm từ dashboard
-2. Hệ thống hiển thị bảng điểm trung bình của tất cả học sinh trong lớp
-3. Bảng điểm bao gồm ĐTB từng môn của mỗi học sinh
+2. Hệ thống hiển thị bảng điểm trung bình theo từng môn của tất cả học sinh trong lớp
+
+*Xem bảng điểm chi tiết của từng học sinh:*
+1. Giáo viên click vào nút bảng điểm của học sinh
+2. Hệ thống hiển thị bảng điểm chi tiết (tất cả cột điểm, hệ số, ĐTB) của học sinh đó
 
 **Input Data:**
 - Không có input (hệ thống hiển thị tự động)
 
 **Output Data:**
 - Bảng điểm trung bình các môn của tất cả học sinh trong lớp
+- Bảng điểm chi tiết của từng học sinh (khi click xem chi tiết)
 
 **Validation Rules:**
 - Không áp dụng
@@ -767,6 +778,7 @@ Giáo viên chủ nhiệm xem bảng điểm trung bình tất cả các môn c�
 |---|---|
 | BR-011-01 | GVCN chỉ xem bảng điểm, không chỉnh sửa điểm |
 | BR-011-02 | Bảng điểm hiển thị ĐTB tất cả các môn học của lớp |
+| BR-011-03 | Có nút xem bảng điểm chi tiết cho từng học sinh |
 
 **Exception Handling:**
 
@@ -897,17 +909,17 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 ### FR-014: Lớp bộ môn – Quản lý điểm
 
 **Mô tả chức năng:**
-Giáo viên bộ môn quản lý điểm học sinh trong lớp được phân công. Bao gồm: xem danh sách lớp và môn phụ trách, thêm cột điểm, chọn hệ số điểm, chỉnh sửa điểm trực tiếp trên bảng.
+Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ môn kèm thông tin lớp và bộ môn. Khi click vào xem chi tiết, hiển thị bảng điểm chi tiết. Giáo viên chỉnh sửa điểm trực tiếp tại bảng, nhấn "Lưu" để lưu và tính lại điểm.
 
 **Actor:** Giáo viên (vai trò GVBM)
 
 **Business Flow:**
-1. Giáo viên chọn lớp bộ môn từ dashboard
-2. Hệ thống hiển thị bảng điểm của lớp theo môn phụ trách
-3. Giáo viên có thể:
-   - Thêm cột điểm mới (chọn hệ số)
-   - Nhập/chỉnh sửa điểm trực tiếp trên bảng
-4. Hệ thống tự động tính điểm trung bình
+1. Giáo viên chọn lớp bộ môn từ dashboard (hiển thị lớp + bộ môn phụ trách)
+2. Click vào xem chi tiết
+3. Hệ thống hiển thị bảng điểm chi tiết của học sinh trong bộ môn đó
+4. Giáo viên chỉnh sửa điểm trực tiếp tại bảng
+5. Nhấn nút "Lưu" → hệ thống lưu điểm và tính toán lại ĐTB
+6. Khi cần thêm cột điểm mới: click nút "Thêm điểm", tại title cột chọn hệ số để nhập điểm
 
 **Input Data:**
 
@@ -941,8 +953,9 @@ Giáo viên bộ môn quản lý điểm học sinh trong lớp được phân c
 |---|---|
 | BR-014-01 | GVBM chỉ quản lý điểm của lớp và môn mình được phân công |
 | BR-014-02 | Mỗi cột điểm có hệ số riêng |
-| BR-014-03 | Chỉnh sửa điểm trực tiếp trên bảng (inline editing) |
-| BR-014-04 | Hệ thống tự động tính điểm trung bình khi có thay đổi |
+| BR-014-03 | Chỉnh sửa điểm trực tiếp trên bảng (inline editing), sau đó nhấn nút "Lưu" |
+| BR-014-04 | Sau khi nhấn "Lưu", hệ thống lưu điểm và tính toán lại ĐTB |
+| BR-014-05 | Thêm cột điểm mới qua nút "Thêm điểm", chọn hệ số tại title cột |
 
 > **Lưu ý:** BRD không đề cập: thang điểm (0-10 hay 0-100), các giá trị hệ số cụ thể (1, 2, 3...), số lượng cột điểm tối đa, cột điểm có tên không. **BRD không đề cập.**
 
@@ -958,13 +971,13 @@ Giáo viên bộ môn quản lý điểm học sinh trong lớp được phân c
 ### FR-015: Công thức tính điểm trung bình
 
 **Mô tả chức năng:**
-Hệ thống tự động tính điểm trung bình môn học cho từng học sinh dựa trên điểm các cột và hệ số tương ứng.
+Hệ thống tự động tính điểm trung bình môn học cho từng học sinh dựa trên điểm các cột và hệ số tương ứng. Công thức sử dụng trung bình có trọng số (weighted average).
 
 **Actor:** Hệ thống (tự động)
 
 **Business Flow:**
-1. GVBM nhập hoặc cập nhật điểm
-2. Hệ thống tự động tính lại ĐTB theo công thức có trọng số hệ số
+1. GVBM nhập hoặc cập nhật điểm, nhấn "Lưu"
+2. Hệ thống tính lại ĐTB theo công thức có trọng số hệ số
 
 **Input Data:**
 - Tất cả điểm thành phần và hệ số tương ứng của học sinh
@@ -983,9 +996,23 @@ Hệ thống tự động tính điểm trung bình môn học cho từng học 
 | STT | Rule |
 |---|---|
 | BR-015-01 | ĐTB = Tổng (Điểm × Hệ số) / Tổng Hệ số |
-| BR-015-02 | ĐTB được tự động tính lại khi có thay đổi điểm |
+| BR-015-02 | ĐTB được tính lại khi GVBM nhấn "Lưu" |
 
-> **Lưu ý:** BRD đề cập "Công thức tính điểm trung bình" ở mục 4.3.5 nhưng nội dung chi tiết công thức bị cắt ngắn / không đầy đủ. Công thức trên (trung bình có trọng số) được suy luận từ ngữ cảnh "hệ số điểm". **Cần xác nhận lại công thức chính xác với stakeholder.**
+**Ví dụ minh họa:**
+
+Giả sử học sinh có:
+- 3 con điểm hệ số 1: lần lượt là 7, 8, 9
+- 2 con điểm hệ số 2: lần lượt là 7, 9
+- 1 con điểm hệ số 3: là 8
+
+```
+ĐTB = (7 + 8 + 9 + 2×(7 + 9) + 3×8) / (1 + 1 + 1 + 2 + 2 + 3)
+     = (7 + 8 + 9 + 14 + 18 + 24) / 10
+     = 80 / 10
+     = 8.0
+```
+
+Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
 
 **Exception Handling:**
 
@@ -1124,20 +1151,20 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 
 ### 6.3 Các điểm cần làm rõ với Stakeholder
 
-| STT | Câu hỏi |
-|---|---|
-| Q-001 | Tài khoản Admin School mặc định: tất cả trường dùng chung email adminstpoint@gmail.com hay có quy tắc generate riêng? |
-| Q-002 | Cơ chế chuyển trạng thái năm học: tự động theo thời gian hay thủ công bởi Admin School? |
-| Q-003 | Các giá trị cụ thể của trạng thái làm việc giáo viên? |
-| Q-004 | Các giá trị cụ thể của trạng thái học sinh (ngoài "Đang học")? |
-| Q-005 | Thang điểm: 0-10 hay 0-100? |
-| Q-006 | Các giá trị hệ số điểm cụ thể (1, 2, 3...)? |
-| Q-007 | Công thức tính ĐTB chính xác (trung bình có trọng số)? |
-| Q-008 | Kênh gửi thông báo nhận xét: in-app, email, SMS? |
-| Q-009 | Có chức năng xóa cho giáo viên, học sinh, lớp, điểm không? |
-| Q-010 | Chi tiết các trường dữ liệu của trường học (entity School)? |
-| Q-011 | Dòng "indicate." ở mục 4.3.2 có ý nghĩa gì? (Có thể là lỗi soạn thảo) |
+| STT | Câu hỏi | Trạng thái |
+|---|---|---|
+| Q-001 | Tài khoản Admin School được tạo tự động: thông tin đăng nhập mặc định (email, password) là gì? | Chưa rõ |
+| Q-002 | Cơ chế chuyển trạng thái năm học: tự động theo thời gian hay thủ công bởi Admin School? | Chưa rõ |
+| ~~Q-003~~ | ~~Các giá trị cụ thể của trạng thái làm việc giáo viên?~~ | **Đã giải đáp:** Đang làm việc / Đã nghỉ |
+| ~~Q-004~~ | ~~Các giá trị cụ thể của trạng thái học sinh?~~ | **Đã giải đáp:** Đang học / Đã nghỉ |
+| Q-005 | Thang điểm: 0-10 hay 0-100? | Chưa rõ |
+| Q-006 | Các giá trị hệ số điểm cụ thể (1, 2, 3...)? | Chưa rõ |
+| ~~Q-007~~ | ~~Công thức tính ĐTB chính xác?~~ | **Đã giải đáp:** ĐTB = Tổng(Điểm × Hệ số) / Tổng Hệ số |
+| Q-008 | Kênh gửi thông báo nhận xét: in-app, email, SMS? | Chưa rõ |
+| Q-009 | Có chức năng xóa cho giáo viên, học sinh, lớp, điểm không? | Chưa rõ |
+| Q-010 | Chi tiết các trường dữ liệu của trường học (entity School)? | Chưa rõ |
+| ~~Q-011~~ | ~~Dòng "indicate." ở mục 4.3.2 có ý nghĩa gì?~~ | **Đã giải đáp:** Xem bảng điểm chi tiết của từng học sinh |
 
 ---
 
-*Kết thúc tài liệu SRS v1.0*
+*Kết thúc tài liệu SRS v1.1*

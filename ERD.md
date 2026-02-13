@@ -7,23 +7,23 @@
 | Mục | Nội dung |
 |---|---|
 | Tên dự án | Hệ thống Quản lý điểm học sinh |
-| Tài liệu tham chiếu | BRD v1.0, SRS v1.0 |
+| Tài liệu tham chiếu | BRD v1.1, SRS v1.1 |
 | Người soạn | Business Analyst |
 | Ngày tạo | 13/02/2026 |
-| Phiên bản | 1.0 |
+| Phiên bản | 1.1 |
 
 ---
 
 ## 1. Tổng quan
 
-Tài liệu này mô tả chi tiết mô hình dữ liệu (Entity Relationship Diagram) của Hệ thống Quản lý điểm học sinh. Tất cả entity, attribute và relationship được trích xuất trực tiếp từ BRD v1.0 và SRS v1.0.
+Tài liệu này mô tả chi tiết mô hình dữ liệu (Entity Relationship Diagram) của Hệ thống Quản lý điểm học sinh. Tất cả entity, attribute và relationship được trích xuất trực tiếp từ BRD v1.1 và SRS v1.1.
 
 ### 1.1 Danh sách Entity
 
 | STT | Entity | Mô tả | Nguồn tham chiếu |
 |---|---|---|---|
 | 1 | `users` | Tài khoản đăng nhập hệ thống (tất cả role) | BRD 3.1, SRS FR-001 |
-| 2 | `schools` | Trường học | BRD 4.1.1, SRS FR-002 |
+| 2 | `schools` | Trường học | BRD 4.1.2, SRS FR-002 |
 | 3 | `academic_years` | Năm học | BRD 4.2.1, SRS FR-003 |
 | 4 | `subjects` | Môn học | BRD 4.2.2, SRS FR-004 |
 | 5 | `teachers` | Giáo viên | BRD 4.2.3, SRS FR-005 |
@@ -88,7 +88,7 @@ erDiagram
 
 **Mô tả:** Bảng chứa thông tin đăng nhập của tất cả người dùng trong hệ thống. Mỗi user được gắn với đúng 1 role.
 
-**Nguồn:** BRD 2.3, 3.1 | SRS FR-001, BR-001-01, BR-001-02
+**Nguồn:** BRD 2.3, 3.1, 4.1.1 | SRS FR-001, BR-001-01, BR-001-02, BR-001-03
 
 | Tên cột | Kiểu dữ liệu | Nullable | Unique | Mô tả |
 |---|---|---|---|---|
@@ -106,10 +106,18 @@ erDiagram
 - `FK`: `school_id` → `schools.id`
 - `CHECK`: `role` IN (`admin_system`, `admin_school`, `teacher`, `parent`, `student`)
 
+**Seed Data:**
+- Tài khoản Admin System mặc định (tạo sẵn khi khởi tạo hệ thống):
+  - `email`: `adminstpoint@gmail.com`
+  - `password`: `adminstpoiNt1122@` (phải mã hóa)
+  - `role`: `admin_system`
+  - `school_id`: `NULL`
+
 **Business Rules liên quan:**
 - BR-001-01: Phân quyền dựa trên `role`
 - BR-001-02: Mỗi tài khoản gắn đúng 1 role
-- BR-002-01: Khi tạo trường → tự động tạo 1 record user với role = `admin_school`
+- BR-001-03: Tài khoản Admin System có email/password mặc định (xem Seed Data)
+- BR-002-01: Khi tạo trường → tự động tạo 1 record user với role = `admin_school` và `school_id` = id trường vừa tạo
 
 ---
 
@@ -117,7 +125,7 @@ erDiagram
 
 **Mô tả:** Bảng chứa thông tin các trường học được Admin System quản lý. Khi tạo trường, hệ thống tự động tạo tài khoản Admin School tương ứng.
 
-**Nguồn:** BRD 4.1.1 | SRS FR-002
+**Nguồn:** BRD 4.1.2 | SRS FR-002
 
 | Tên cột | Kiểu dữ liệu | Nullable | Unique | Mô tả |
 |---|---|---|---|---|
@@ -133,6 +141,8 @@ erDiagram
 
 **Business Rules liên quan:**
 - BR-002-01: Khi INSERT vào `schools` → trigger tạo 1 record trong `users` với role = `admin_school` và `school_id` = id trường vừa tạo
+
+> **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin adminstpoint@gmail.com / adminstpoiNt1122@ là của Admin System, không phải Admin School. **Cần làm rõ cơ chế generate tài khoản Admin School với stakeholder.**
 
 ---
 
@@ -214,7 +224,7 @@ erDiagram
 | `citizen_id` | VARCHAR(20) | NOT NULL | UQ | Số CCCD – duy nhất toàn hệ thống |
 | `teacher_code` | VARCHAR(50) | NOT NULL | UQ | Mã số giáo viên – duy nhất toàn hệ thống |
 | `gender` | ENUM | NOT NULL | - | Giới tính |
-| `work_status` | ENUM | NOT NULL | - | Trạng thái làm việc |
+| `work_status` | ENUM | NOT NULL | - | Trạng thái làm việc: `active` / `resigned` |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
 
@@ -226,9 +236,14 @@ erDiagram
 - `UQ`: `citizen_id` (CCCD unique toàn hệ thống)
 - `UQ`: `teacher_code` (Mã GV unique toàn hệ thống)
 
-> **Lưu ý:** BRD không liệt kê giá trị cụ thể cho `gender` và `work_status`. Dev cần confirm:
-> - `gender`: Gợi ý `male` / `female` / `other`
-> - `work_status`: Gợi ý `active` / `inactive` / `resigned`
+**Mapping giá trị work_status:**
+
+| Giá trị DB | Hiển thị UI (tiếng Việt) |
+|---|---|
+| `active` | Đang làm việc |
+| `resigned` | Đã nghỉ |
+
+> **Lưu ý:** BRD không liệt kê giá trị cụ thể cho `gender`. Gợi ý: `male` / `female` / `other`.
 
 **Business Rules liên quan:**
 - BR-005-01: `citizen_id` UNIQUE
@@ -252,7 +267,7 @@ erDiagram
 | `date_of_birth` | DATE | NOT NULL | - | Ngày sinh |
 | `address` | VARCHAR(500) | NOT NULL | - | Địa chỉ |
 | `gender` | ENUM | NOT NULL | - | Giới tính |
-| `study_status` | ENUM | NOT NULL | - | Trạng thái học tập |
+| `study_status` | ENUM | NOT NULL | - | Trạng thái học tập: `studying` / `dropped_out` |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
 
@@ -262,14 +277,12 @@ erDiagram
 - `FK`: `school_id` → `schools.id`
 - `UQ`: `user_id`
 
-> **Lưu ý:** BRD chỉ đề cập giá trị "Đang học" cho `study_status` (trong ngữ cảnh lọc HS khi thêm vào lớp). Các giá trị khác chưa rõ. Gợi ý: `studying` / `suspended` / `graduated` / `dropped_out`
-
 **Mapping giá trị study_status:**
 
-| Giá trị DB | Hiển thị UI |
+| Giá trị DB | Hiển thị UI (tiếng Việt) |
 |---|---|
 | `studying` | Đang học |
-| (Các giá trị khác) | BRD không đề cập |
+| `dropped_out` | Đã nghỉ |
 
 **Business Rules liên quan:**
 - BR-006-01: `id` là duy nhất, hệ thống tự tạo
@@ -454,10 +467,26 @@ Mỗi `student_id` chỉ xuất hiện 1 lần trong tất cả các lớp của
 ĐTB môn = SUM(scores.value × score_columns.coefficient) / SUM(score_columns.coefficient)
 ```
 
+**Ví dụ minh họa:**
+
+Giả sử học sinh có:
+- 3 con điểm hệ số 1: lần lượt là 7, 8, 9
+- 2 con điểm hệ số 2: lần lượt là 7, 9
+- 1 con điểm hệ số 3: là 8
+
+```
+ĐTB = (7 + 8 + 9 + 2×(7 + 9) + 3×8) / (1 + 1 + 1 + 2 + 2 + 3)
+     = (7 + 8 + 9 + 14 + 18 + 24) / 10
+     = 80 / 10
+     = 8.0
+```
+
+Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
+
 ```sql
 -- Query tính ĐTB môn cho 1 HS trong 1 phân công
 SELECT
-    sc.student_id,
+    s.student_id,
     SUM(s.value * col.coefficient) / SUM(col.coefficient) AS average_score
 FROM scores s
 JOIN score_columns col ON s.score_column_id = col.id
@@ -468,9 +497,10 @@ GROUP BY s.student_id;
 ```
 
 **Business Rules liên quan:**
-- BR-014-03: Inline editing → UPDATE `scores.value` trực tiếp
-- BR-015-01: Công thức ĐTB có trọng số
-- BR-015-02: ĐTB tính lại mỗi khi `scores.value` thay đổi
+- BR-014-03: Inline editing → UPDATE `scores.value` trực tiếp, sau đó nhấn "Lưu"
+- BR-014-04: Sau khi nhấn "Lưu" → hệ thống tính toán lại ĐTB
+- BR-015-01: Công thức ĐTB có trọng số (weighted average)
+- BR-015-02: ĐTB tính lại khi GVBM nhấn "Lưu"
 
 ---
 
@@ -597,18 +627,19 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 
 ## 6. Các điểm cần Dev lưu ý
 
-| STT | Nội dung | Lý do |
+| STT | Nội dung | Trạng thái |
 |---|---|---|
-| 1 | Bảng `schools` thiếu field chi tiết | BRD không mô tả – cần confirm stakeholder |
-| 2 | Enum `gender`, `work_status`, `study_status` chưa có giá trị cụ thể | BRD không liệt kê |
-| 3 | Thang điểm (`scores.value`) chưa xác định | BRD không đề cập (0-10 hay 0-100) |
-| 4 | Giá trị `coefficient` chưa rõ phạm vi | BRD không liệt kê (1, 2, 3...) |
-| 5 | Cột `score_columns` có cần trường `name` không | BRD không đề cập cột điểm có tên |
-| 6 | Ràng buộc 1 HS / 1 lớp / năm học cần xử lý ở application-level hoặc thêm cột | Xem ghi chú tại `class_students` |
-| 7 | Ràng buộc chỉ 1 năm học `in_progress` / trường cần partial unique index hoặc trigger | DB-specific implementation |
-| 8 | Kênh gửi notification (in-app, email, push) chưa rõ | BRD không đề cập |
-| 9 | Tài khoản Admin School mặc định cùng email cho tất cả trường | Cần confirm logic generate email |
+| 1 | Bảng `schools` thiếu field chi tiết | Chưa rõ – cần confirm stakeholder |
+| ~~2~~ | ~~Enum `work_status`, `study_status` chưa có giá trị cụ thể~~ | **Đã giải đáp:** `work_status`: active/resigned. `study_status`: studying/dropped_out |
+| 3 | Enum `gender` chưa có giá trị cụ thể | Chưa rõ – gợi ý male/female/other |
+| 4 | Thang điểm (`scores.value`) chưa xác định | Chưa rõ – BRD không đề cập (0-10 hay 0-100) |
+| 5 | Giá trị `coefficient` chưa rõ phạm vi | Chưa rõ – BRD không liệt kê (1, 2, 3...) |
+| 6 | Cột `score_columns` có cần trường `name` không | Chưa rõ – BRD không đề cập |
+| 7 | Ràng buộc 1 HS / 1 lớp / năm học cần xử lý ở application-level hoặc thêm cột | Xem ghi chú tại `class_students` |
+| 8 | Ràng buộc chỉ 1 năm học `in_progress` / trường cần partial unique index hoặc trigger | DB-specific implementation |
+| 9 | Kênh gửi notification (in-app, email, push) chưa rõ | Chưa rõ – BRD không đề cập |
+| 10 | Tài khoản Admin School tạo tự động: email/password mặc định chưa rõ | Chưa rõ – cần confirm stakeholder (adminstpoint@gmail.com là của Admin System) |
 
 ---
 
-*Kết thúc tài liệu ERD v1.0*
+*Kết thúc tài liệu ERD v1.1*
