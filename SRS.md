@@ -857,9 +857,10 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 
 *Gửi tự động (System job):*
 1. Hệ thống kiểm tra các nhận xét "Đã lên lịch" có thời gian gửi đã đến
-2. Gửi thông báo đến phụ huynh và học sinh
-3. Nội dung thông báo: "Nhận xét mới từ giáo viên [Tên giáo viên]"
-4. Chuyển trạng thái nhận xét thành "Đã gửi"
+2. Gửi email thông báo đến email đã đăng ký của phụ huynh và học sinh
+3. Tiêu đề email: "Nhận xét mới từ giáo viên"
+4. Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm."
+5. Chuyển trạng thái nhận xét thành "Đã gửi"
 
 *Xem lịch sử nhận xét:*
 1. Giáo viên truy cập danh sách nhận xét
@@ -893,7 +894,8 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 | MSG-013-01 | "Vui lòng nhập nội dung nhận xét" | Nội dung để trống |
 | MSG-013-02 | "Vui lòng chọn thời gian gửi" | Thời gian để trống |
 | MSG-013-03 | "Thời gian gửi phải là thời gian trong tương lai" | Thời gian <= hiện tại |
-| MSG-013-04 | "Nhận xét mới từ giáo viên [Tên giáo viên]" | Thông báo gửi đến phụ huynh/học sinh |
+| MSG-013-04 | Tiêu đề email: "Nhận xét mới từ giáo viên" | Email thông báo gửi đến phụ huynh/học sinh |
+| MSG-013-05 | Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." | Nội dung email thông báo |
 
 **Business Rules:**
 
@@ -901,8 +903,9 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 |---|---|
 | BR-013-01 | Khi tạo nhận xét → trạng thái mặc định là "Đã lên lịch" |
 | BR-013-02 | Chỉ được chỉnh sửa nhận xét khi trạng thái còn "Đã lên lịch" |
-| BR-013-03 | Khi đến thời điểm gửi: hệ thống tự động gửi thông báo đến phụ huynh và học sinh |
-| BR-013-04 | Nội dung thông báo: "Nhận xét mới từ giáo viên [Tên giáo viên]" |
+| BR-013-03 | Khi đến thời điểm gửi: hệ thống tự động gửi email thông báo đến email đã đăng ký của phụ huynh và học sinh |
+| BR-013-04 | Tiêu đề email: "Nhận xét mới từ giáo viên" |
+| BR-013-08 | Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." |
 | BR-013-05 | Sau khi gửi, trạng thái chuyển thành "Đã gửi" |
 | BR-013-06 | Nhận xét đã gửi không thể chỉnh sửa (suy luận từ BR-013-02) |
 | BR-013-07 | Lịch sử nhận xét sắp xếp theo thứ tự mới nhất lên trước |
@@ -1045,7 +1048,7 @@ Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của c
 **Business Flow:**
 1. Phụ huynh đăng nhập hệ thống
 2. Hệ thống hiển thị thông tin điểm và nhận xét của con
-3. Phụ huynh nhận thông báo khi có nhận xét mới từ giáo viên
+3. Phụ huynh nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
 
 **Input Data:**
 - Không có input (chỉ xem)
@@ -1053,7 +1056,7 @@ Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của c
 **Output Data:**
 - Bảng điểm của con (theo môn, theo lớp)
 - Danh sách nhận xét từ giáo viên
-- Thông báo nhận xét mới
+- Email thông báo nhận xét mới
 
 **Validation Rules:**
 - Không áp dụng
@@ -1066,7 +1069,7 @@ Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của c
 | STT | Rule |
 |---|---|
 | BR-016-01 | Phụ huynh chỉ xem được thông tin của con mình |
-| BR-016-02 | Phụ huynh nhận thông báo "Nhận xét mới từ giáo viên [Tên giáo viên]" khi nhận xét được gửi |
+| BR-016-02 | Phụ huynh nhận email thông báo khi nhận xét được gửi. Tiêu đề: "Nhận xét mới từ giáo viên". Nội dung: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." |
 | BR-016-03 | Phụ huynh chỉ có quyền xem, không có quyền chỉnh sửa |
 
 **Exception Handling:**
@@ -1088,7 +1091,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 **Business Flow:**
 1. Học sinh đăng nhập hệ thống
 2. Hệ thống hiển thị điểm và nhận xét cá nhân
-3. Học sinh nhận thông báo khi có nhận xét mới từ giáo viên
+3. Học sinh nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
 
 **Input Data:**
 - Không có input (chỉ xem)
@@ -1096,7 +1099,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 **Output Data:**
 - Bảng điểm cá nhân (theo môn)
 - Danh sách nhận xét từ giáo viên
-- Thông báo nhận xét mới
+- Email thông báo nhận xét mới
 
 **Validation Rules:**
 - Không áp dụng
@@ -1109,7 +1112,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 | STT | Rule |
 |---|---|
 | BR-017-01 | Học sinh chỉ xem được thông tin điểm và nhận xét của chính mình |
-| BR-017-02 | Học sinh nhận thông báo "Nhận xét mới từ giáo viên [Tên giáo viên]" khi nhận xét được gửi |
+| BR-017-02 | Học sinh nhận email thông báo khi nhận xét được gửi. Tiêu đề: "Nhận xét mới từ giáo viên". Nội dung: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." |
 | BR-017-03 | Học sinh chỉ có quyền xem, không có quyền chỉnh sửa |
 
 **Exception Handling:**
@@ -1129,7 +1132,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 | NFR-002 | Bảo mật | Mật khẩu phải được mã hóa khi lưu trữ | BRD không đề cập – khuyến nghị bổ sung |
 | NFR-003 | Hiệu năng | Hệ thống hỗ trợ nhiều trường học đồng thời (multi-tenant) | Suy luận từ kiến trúc Admin System → nhiều trường |
 | NFR-004 | Tự động hóa | Hệ thống có cơ chế job tự động gửi nhận xét đúng thời gian đã lên lịch | Từ BRD mục 4.3.3 |
-| NFR-005 | Thông báo | Hệ thống hỗ trợ gửi thông báo đến phụ huynh và học sinh | Từ BRD mục 4.3.3 |
+| NFR-005 | Thông báo | Hệ thống hỗ trợ gửi thông báo qua email đến phụ huynh và học sinh. Tiêu đề: "Nhận xét mới từ giáo viên". Nội dung: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." | Từ BRD mục 4.3.3 |
 | NFR-006 | Giao diện | Hỗ trợ chỉnh sửa điểm trực tiếp trên bảng (inline editing) | Từ BRD mục 4.3.4 |
 | NFR-007 | Giao diện | Hỗ trợ popup chọn học sinh khi thêm vào lớp | Từ BRD mục 4.2.6 |
 
@@ -1146,7 +1149,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 | AS-001 | Mỗi trường học hoạt động độc lập, dữ liệu không chia sẻ giữa các trường |
 | AS-002 | Admin School chỉ quản lý dữ liệu trong phạm vi trường mình được gán |
 | AS-003 | Giáo viên có thể vừa là GVCN vừa là GVBM (khác lớp hoặc cùng lớp) |
-| AS-004 | Thông báo nhận xét được gửi qua hệ thống (in-app notification) – kênh cụ thể BRD không đề cập |
+| AS-004 | Thông báo nhận xét được gửi qua email đã đăng ký của phụ huynh và học sinh |
 | AS-005 | Hệ thống hoạt động theo niên khóa (năm học), dữ liệu được tổ chức theo năm học |
 | AS-006 | Trạng thái mặc định khi tạo năm học là "Chuẩn bị diễn ra" |
 
@@ -1172,7 +1175,7 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 | Q-005 | Thang điểm: 0-10 hay 0-100? | Chưa rõ |
 | Q-006 | Các giá trị hệ số điểm cụ thể (1, 2, 3...)? | Chưa rõ |
 | ~~Q-007~~ | ~~Công thức tính ĐTB chính xác?~~ | **Đã giải đáp:** ĐTB = Tổng(Điểm × Hệ số) / Tổng Hệ số |
-| Q-008 | Kênh gửi thông báo nhận xét: in-app, email, SMS? | Chưa rõ |
+| ~~Q-008~~ | ~~Kênh gửi thông báo nhận xét: in-app, email, SMS?~~ | **Đã giải đáp:** Gửi qua email đã đăng ký của phụ huynh và học sinh |
 | Q-009 | Có chức năng xóa cho giáo viên, học sinh, lớp, điểm không? | Chưa rõ |
 | ~~Q-010~~ | ~~Chi tiết các trường dữ liệu của trường học (entity School)?~~ | **Đã giải đáp:** Tên trường, Mã trường (unique, tự nhập) |
 | ~~Q-011~~ | ~~Dòng "indicate." ở mục 4.3.2 có ý nghĩa gì?~~ | **Đã giải đáp:** Xem bảng điểm chi tiết của từng học sinh |

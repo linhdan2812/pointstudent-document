@@ -35,7 +35,7 @@ Tài liệu này mô tả chi tiết mô hình dữ liệu (Entity Relationship 
 | 11 | `score_columns` | Cột điểm (do GVBM tạo) | BRD 4.3.4, SRS FR-014 |
 | 12 | `scores` | Điểm số của học sinh | BRD 4.3.4, SRS FR-014 |
 | 13 | `comments` | Nhận xét học sinh (do GVCN tạo) | BRD 4.3.3, SRS FR-013 |
-| 14 | `notifications` | Thông báo gửi đến phụ huynh/học sinh | BRD 4.3.3, SRS FR-013 |
+| 14 | `notifications` | Thông báo email gửi đến phụ huynh/học sinh | BRD 4.3.3, SRS FR-013 |
 
 ---
 
@@ -559,7 +559,7 @@ GROUP BY s.student_id;
 **Business Rules liên quan:**
 - BR-013-01: Khi INSERT → `status = 'scheduled'`
 - BR-013-02: Chỉ UPDATE được khi `status = 'scheduled'`
-- BR-013-03: System job kiểm tra `WHERE status = 'scheduled' AND scheduled_at <= NOW()` → gửi thông báo
+- BR-013-03: System job kiểm tra `WHERE status = 'scheduled' AND scheduled_at <= NOW()` → gửi email thông báo đến email đã đăng ký của phụ huynh và học sinh
 - BR-013-05: Sau khi gửi → `UPDATE status = 'sent'`
 - BR-013-07: `ORDER BY created_at DESC` (mới nhất lên trước)
 
@@ -567,7 +567,7 @@ GROUP BY s.student_id;
 
 ### 3.14 `notifications` – Thông báo
 
-**Mô tả:** Bảng chứa thông báo gửi đến phụ huynh và học sinh khi nhận xét được gửi. Hệ thống tự động tạo notification khi comment chuyển trạng thái sang `sent`.
+**Mô tả:** Bảng chứa thông báo email gửi đến phụ huynh và học sinh khi nhận xét được gửi. Hệ thống tự động tạo notification và gửi email khi comment chuyển trạng thái sang `sent`.
 
 **Nguồn:** BRD 4.3.3 | SRS FR-013, FR-016, FR-017
 
@@ -576,19 +576,23 @@ GROUP BY s.student_id;
 | `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính |
 | `user_id` | FK → users.id | NOT NULL | - | Người nhận thông báo (PH hoặc HS) |
 | `comment_id` | FK → comments.id | NOT NULL | - | Nhận xét gốc |
-| `message` | VARCHAR(500) | NOT NULL | - | Nội dung: "Nhận xét mới từ giáo viên [Tên GV]" |
-| `is_read` | BOOLEAN | NOT NULL | - | Đã đọc hay chưa (default: false) |
+| `email_to` | VARCHAR(255) | NOT NULL | - | Email người nhận (lấy từ users.email) |
+| `email_subject` | VARCHAR(255) | NOT NULL | - | Tiêu đề email: "Nhận xét mới từ giáo viên" |
+| `email_body` | TEXT | NOT NULL | - | Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." |
+| `is_sent` | BOOLEAN | NOT NULL | - | Email đã gửi thành công chưa (default: false) |
+| `sent_at` | TIMESTAMP | NULL | - | Thời gian gửi email thành công |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo thông báo |
 
 **Constraints:**
 - `PK`: `id`
 - `FK`: `user_id` → `users.id`
 - `FK`: `comment_id` → `comments.id`
-- `DEFAULT`: `is_read = false`
+- `DEFAULT`: `is_sent = false`
 
 **Business Rules liên quan:**
-- BR-013-03: Khi comment được gửi → tạo 2 notification: 1 cho student (user), 1 cho parent (user)
-- BR-013-04: `message` = "Nhận xét mới từ giáo viên [teachers.full_name]"
+- BR-013-03: Khi comment được gửi → tạo 2 notification: 1 cho student (user), 1 cho parent (user) → gửi email đến email đã đăng ký
+- BR-013-04: `email_subject` = "Nhận xét mới từ giáo viên"
+- BR-013-08: `email_body` = "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm."
 
 ---
 
@@ -657,7 +661,7 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 | 6 | Cột `score_columns` có cần trường `name` không | Chưa rõ – BRD không đề cập |
 | 7 | Ràng buộc 1 HS / 1 lớp / năm học cần xử lý ở application-level hoặc thêm cột | Xem ghi chú tại `class_students` |
 | 8 | Ràng buộc chỉ 1 năm học `in_progress` / trường cần partial unique index hoặc trigger | DB-specific implementation |
-| 9 | Kênh gửi notification (in-app, email, push) chưa rõ | Chưa rõ – BRD không đề cập |
+| ~~9~~ | ~~Kênh gửi notification (in-app, email, push) chưa rõ~~ | **Đã giải đáp:** Gửi qua email đã đăng ký của phụ huynh và học sinh |
 | 10 | Tài khoản Admin School tạo tự động: email/password mặc định chưa rõ | Chưa rõ – cần confirm stakeholder (adminstpoint@gmail.com là của Admin System) |
 
 ---

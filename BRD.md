@@ -235,8 +235,9 @@ Hiển thị:
 1. Khi tạo nhận xét → trạng thái Đã lên lịch
 2. Có thể chỉnh sửa trước khi gửi
 3. Khi đến thời điểm gửi:
-   - Gửi thông báo đến phụ huynh và học sinh
-   - Nội dung: "Nhận xét mới từ giáo viên + tên giáo viên"
+   - Gửi thông báo qua email đã đăng ký của phụ huynh và học sinh
+   - Tiêu đề email: "Nhận xét mới từ giáo viên"
+   - Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm."
    - Chuyển trạng thái thành Đã gửi
 4. Lịch sử nhận xét sắp xếp mới nhất
 
@@ -291,7 +292,7 @@ Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
 
 ### Chức năng
 - Phụ huynh sau khi đăng nhập chỉ có thể xem bảng điểm và nhận xét về con của mình
-- Nhận thông báo khi có nhận xét mới từ giáo viên
+- Nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
 
 ### Quy tắc
 - Phụ huynh chỉ xem được thông tin của con mình
@@ -307,7 +308,7 @@ Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
 
 ### Chức năng
 - Học sinh sau khi đăng nhập chỉ có thể xem bảng điểm và nhận xét về chính mình
-- Nhận thông báo khi có nhận xét mới từ giáo viên
+- Nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
 
 ### Quy tắc
 - Học sinh chỉ xem được thông tin điểm và nhận xét của chính mình
