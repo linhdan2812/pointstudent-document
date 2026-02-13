@@ -460,7 +460,7 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 
 | Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
 |---|---|---|---|
-| ID | String/Auto | Hệ thống tạo | Mã định danh học sinh |
+| ID | String/Auto | Hệ thống tự tạo | Mã định danh học sinh. Format: `[Mã trường][Năm nhập học][Số thứ tự]`. Ví dụ: `TH012025001`. Số thứ tự tăng dần, mỗi năm reset lại từ 1 |
 | Họ tên | String | Có | Họ và tên học sinh |
 | Ngày sinh | Date | Có | Ngày sinh |
 | Địa chỉ | String | Có | Địa chỉ |
@@ -517,7 +517,7 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 
 | STT | Rule |
 |---|---|
-| BR-006-01 | Mỗi học sinh có ID duy nhất do hệ thống tạo |
+| BR-006-01 | Mỗi học sinh có ID duy nhất do hệ thống tự tạo theo format: `[Mã trường] + [Năm nhập học] + [Số thứ tự tăng dần]`. Năm nhập học = năm hiện tại khi tạo học sinh. Số thứ tự reset lại từ 1 mỗi năm |
 | BR-006-02 | Thông tin phụ huynh được lưu kèm theo thông tin học sinh |
 | BR-006-03 | Phụ huynh có tài khoản riêng để đăng nhập hệ thống |
 | BR-006-04 | Học sinh có tài khoản riêng để đăng nhập hệ thống |

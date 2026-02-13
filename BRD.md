@@ -140,7 +140,7 @@ Hệ thống bao gồm:
 - Giới tính
 - Email đăng nhập
 - Mật khẩu
-- ID
+- ID: hệ thống tự tạo theo format: Mã trường + Năm nhập học (năm hiện tại khi tạo học sinh) + Số thứ tự tăng dần (mỗi năm reset lại từ 1). Ví dụ: `TH012025001`, `TH012025002`
 - Trạng thái học:
   - Đang học
   - Đã nghỉ

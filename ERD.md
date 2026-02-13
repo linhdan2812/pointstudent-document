@@ -263,7 +263,8 @@ erDiagram
 
 | Tên cột | Kiểu dữ liệu | Nullable | Unique | Mô tả |
 |---|---|---|---|---|
-| `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính (= ID học sinh do hệ thống tạo) |
+| `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính (auto-increment nội bộ) |
+| `student_code` | VARCHAR(50) | NOT NULL | UQ | Mã học sinh – hệ thống tự tạo theo format: `[Mã trường][Năm nhập học][Số thứ tự]`. Ví dụ: `TH012025001`. Số thứ tự tăng dần, mỗi năm reset từ 1 |
 | `user_id` | FK → users.id | NOT NULL | UQ | Tài khoản đăng nhập tương ứng |
 | `school_id` | FK → schools.id | NOT NULL | - | Trường đang theo học |
 | `full_name` | VARCHAR(255) | NOT NULL | - | Họ và tên |
@@ -276,6 +277,7 @@ erDiagram
 
 **Constraints:**
 - `PK`: `id`
+- `UQ`: `student_code` (mã học sinh unique toàn hệ thống)
 - `FK`: `user_id` → `users.id`
 - `FK`: `school_id` → `schools.id`
 - `UQ`: `user_id`
@@ -287,8 +289,21 @@ erDiagram
 | `studying` | Đang học |
 | `dropped_out` | Đã nghỉ |
 
+**Format `student_code`:**
+
+```
+[Mã trường] + [Năm nhập học] + [Số thứ tự tăng dần (3+ chữ số, zero-padded)]
+```
+
+- **Mã trường:** Lấy từ `schools.school_code` của trường mà học sinh thuộc về
+- **Năm nhập học:** Năm hiện tại (4 chữ số) tại thời điểm tạo học sinh
+- **Số thứ tự:** Tăng dần trong phạm vi trường + năm, reset lại từ 1 mỗi năm mới
+- **Ví dụ:** Trường có mã `TH01`, năm 2025, học sinh thứ 1 → `TH012025001`
+
+> **Ghi chú Dev:** Cần maintain bảng hoặc sequence riêng để tracking số thứ tự theo `(school_id, enrollment_year)`. Có thể dùng bảng `student_code_sequences(school_id, year, last_number)` hoặc query `MAX` trên `student_code`.
+
 **Business Rules liên quan:**
-- BR-006-01: `id` là duy nhất, hệ thống tự tạo
+- BR-006-01: `student_code` là duy nhất, hệ thống tự tạo theo format `[Mã trường][Năm nhập học][Số thứ tự]`. Số thứ tự reset mỗi năm
 - BR-008-02: Khi lọc HS thêm vào lớp → `WHERE study_status = 'studying'`
 
 ---
