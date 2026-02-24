@@ -148,6 +148,9 @@ erDiagram
 - BR-002-02: `school_code` UNIQUE toàn hệ thống
 - BR-002-03: `school_code` do Admin System tự nhập
 - BR-002-04: `school_code` tối đa 8 ký tự, chỉ chữ cái và chữ số (regex: `^[a-zA-Z0-9]{1,8}$`)
+- BR-002-05: Trước khi DELETE `schools` → kiểm tra `EXISTS` trong `teachers` và `students` theo `school_id`. Nếu có → trả lỗi, không cho phép xóa
+
+> **Ghi chú Dev:** Xử lý BR-002-05 ở application-level (kiểm tra trước khi DELETE). Không dùng `ON DELETE CASCADE` để tránh xóa dữ liệu liên quan ngoài ý muốn.
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin adminstpoint@gmail.com / adminstpoiNt1122@ là của Admin System, không phải Admin School. **Cần làm rõ cơ chế generate tài khoản Admin School với stakeholder.**
 

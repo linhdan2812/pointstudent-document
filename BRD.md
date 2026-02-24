@@ -100,6 +100,7 @@ Hệ thống bao gồm:
 - Mã trường là duy nhất trong hệ thống, Admin System có thể tự nhập
 - Mã trường tối đa 8 ký tự, chỉ bao gồm chữ cái và chữ số (không có ký tự đặc biệt, khoảng trắng)
 - Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó
+- Khi xóa trường học, hệ thống kiểm tra trường có dữ liệu con liên quan (giáo viên, học sinh) hay không. Nếu có → hiển thị cảnh báo và không cho phép xóa
 
 ---
 

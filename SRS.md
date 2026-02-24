@@ -175,8 +175,10 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 *Xóa trường học:*
 1. Admin System chọn trường học cần xóa
-2. Hệ thống xác nhận thao tác
-3. Hệ thống xóa trường học
+2. Hệ thống kiểm tra trường có dữ liệu con liên quan (giáo viên, học sinh) hay không
+3. Nếu có dữ liệu con → hiển thị cảnh báo MSG-002-06, không thực hiện xóa
+4. Nếu không có dữ liệu con → hiển thị xác nhận xóa
+5. Admin System xác nhận → hệ thống xóa trường học
 
 **Input Data:**
 
@@ -208,6 +210,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | MSG-002-03 | "Mã trường đã tồn tại trong hệ thống" | Mã trường trùng |
 | MSG-002-04 | "Mã trường không được vượt quá 8 ký tự" | Mã trường quá 8 ký tự |
 | MSG-002-05 | "Mã trường chỉ được chứa chữ cái và chữ số" | Mã trường có ký tự đặc biệt hoặc khoảng trắng |
+| MSG-002-06 | "Không thể xóa trường học này vì đang có giáo viên hoặc học sinh liên quan" | Trường có dữ liệu con (giáo viên, học sinh) |
 
 **Business Rules:**
 
@@ -217,6 +220,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | BR-002-02 | Mã trường là duy nhất (unique) trên toàn hệ thống |
 | BR-002-03 | Mã trường do Admin System tự nhập |
 | BR-002-04 | Mã trường tối đa 8 ký tự, chỉ bao gồm chữ cái và chữ số (regex: `^[a-zA-Z0-9]{1,8}$`) |
+| BR-002-05 | Không được xóa trường học nếu trường đó còn giáo viên hoặc học sinh liên quan |
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin đăng nhập adminstpoint@gmail.com / adminstpoiNt1122@ là tài khoản của Admin System, không phải Admin School. **Cần làm rõ cơ chế tạo tài khoản Admin School với stakeholder.**
 
@@ -227,6 +231,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | EX-002-01 | Mã trường trùng | Hiển thị MSG-002-03, không cho phép lưu |
 | EX-002-03 | Mã trường quá 8 ký tự | Hiển thị MSG-002-04, không cho phép lưu |
 | EX-002-04 | Mã trường chứa ký tự không hợp lệ | Hiển thị MSG-002-05, không cho phép lưu |
+| EX-002-05 | Xóa trường học đang có giáo viên hoặc học sinh | Hiển thị MSG-002-06, không thực hiện xóa |
 | EX-002-02 | Không thể tạo tài khoản Admin School | BRD không đề cập |
 
 ---
