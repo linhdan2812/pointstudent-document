@@ -190,6 +190,7 @@ erDiagram
 
 **Business Rules liên quan:**
 - BR-003-01: `WHERE school_id = ? AND status = 'in_progress'` chỉ trả về tối đa 1 record
+- BR-003-03: Khi `status = 'completed'` → toàn bộ điểm (`scores`, `score_columns`) và nhận xét (`comments`) liên kết qua năm học này bị khóa ghi. Kiểm tra application-level trước mỗi thao tác INSERT/UPDATE
 
 ---
 
@@ -529,6 +530,7 @@ GROUP BY s.student_id;
 **Business Rules liên quan:**
 - BR-014-03: Inline editing → UPDATE `scores.value` trực tiếp, sau đó nhấn "Lưu"
 - BR-014-04: Sau khi nhấn "Lưu" → hệ thống tính toán lại ĐTB
+- BR-014-06: Trước khi INSERT/UPDATE `scores` hoặc `score_columns` → kiểm tra `academic_years.status` của năm học liên quan. Nếu `status = 'completed'` → trả lỗi, không cho phép thao tác
 - BR-015-01: Công thức ĐTB có trọng số (weighted average)
 - BR-015-02: ĐTB tính lại khi GVBM nhấn "Lưu"
 
@@ -572,6 +574,7 @@ GROUP BY s.student_id;
 - BR-013-03: System job kiểm tra `WHERE status = 'scheduled' AND scheduled_at <= NOW()` → gửi email thông báo đến email đã đăng ký của phụ huynh và học sinh
 - BR-013-05: Sau khi gửi → `UPDATE status = 'sent'`
 - BR-013-07: `ORDER BY created_at DESC` (mới nhất lên trước)
+- BR-013-09: Trước khi INSERT/UPDATE `comments` → kiểm tra `academic_years.status` của lớp liên quan (`class_id → classes.academic_year_id`). Nếu `status = 'completed'` → trả lỗi, không cho phép thao tác
 
 ---
 

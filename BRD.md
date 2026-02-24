@@ -122,6 +122,7 @@ Hệ thống bao gồm:
 
 ### Quy tắc
 - Chỉ có 1 năm học đang diễn ra tại một thời điểm
+- Khi năm học chuyển sang trạng thái "Đã kết thúc": không được phép thêm mới, chỉnh sửa điểm và nhận xét thuộc năm học đó
 
 ---
 
@@ -260,6 +261,7 @@ Hiển thị:
    - Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm."
    - Chuyển trạng thái thành Đã gửi
 4. Lịch sử nhận xét sắp xếp mới nhất
+5. Khi năm học đã kết thúc: không được thêm mới hoặc chỉnh sửa nhận xét thuộc năm học đó
 
 ---
 
@@ -270,6 +272,9 @@ Hiển thị:
 - Khi click vào xem chi tiết, hiển thị bảng điểm chi tiết của học sinh trong bộ môn đó
 - Chỉnh sửa điểm trực tiếp tại bảng, sau đó nhấn nút "Lưu". Điểm của học sinh sẽ được tính toán lại
 - Khi cần thêm 1 cột điểm mới, click nút "Thêm điểm". Tại title cột sẽ chọn được hệ số để nhập điểm
+
+### Quy tắc
+- Khi năm học đã kết thúc: không được thêm cột điểm mới hoặc chỉnh sửa điểm thuộc năm học đó
 
 ---
 

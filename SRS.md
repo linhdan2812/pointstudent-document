@@ -305,6 +305,7 @@ Admin School quản lý danh sách năm học trong phạm vi trường, bao g�
 |---|---|
 | BR-003-01 | Tại một thời điểm, chỉ có tối đa 1 năm học ở trạng thái "Đang diễn ra" |
 | BR-003-02 | Trạng thái năm học gồm 3 giá trị: "Chuẩn bị diễn ra", "Đang diễn ra", "Đã kết thúc" |
+| BR-003-03 | Khi năm học ở trạng thái "Đã kết thúc": toàn bộ điểm và nhận xét thuộc năm học đó bị khóa – không được thêm mới hoặc chỉnh sửa |
 
 > **Lưu ý:** BRD không đề cập cơ chế chuyển trạng thái năm học (tự động theo thời gian hay Admin School thao tác thủ công). **BRD không đề cập.**
 
@@ -935,6 +936,7 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 | MSG-013-01 | "Vui lòng nhập nội dung nhận xét" | Nội dung để trống |
 | MSG-013-02 | "Vui lòng chọn thời gian gửi" | Thời gian để trống |
 | MSG-013-03 | "Thời gian gửi phải là thời gian trong tương lai" | Thời gian <= hiện tại |
+| MSG-013-06 | "Năm học đã kết thúc, không thể thêm hoặc chỉnh sửa nhận xét" | Thao tác trên nhận xét khi năm học đã kết thúc |
 | MSG-013-04 | Tiêu đề email: "Nhận xét mới từ giáo viên" | Email thông báo gửi đến phụ huynh/học sinh |
 | MSG-013-05 | Nội dung email: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." | Nội dung email thông báo |
 
@@ -950,6 +952,7 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 | BR-013-05 | Sau khi gửi, trạng thái chuyển thành "Đã gửi" |
 | BR-013-06 | Nhận xét đã gửi không thể chỉnh sửa (suy luận từ BR-013-02) |
 | BR-013-07 | Lịch sử nhận xét sắp xếp theo thứ tự mới nhất lên trước |
+| BR-013-09 | Khi năm học ở trạng thái "Đã kết thúc": không được tạo mới hoặc chỉnh sửa nhận xét thuộc năm học đó (BR-003-03) |
 
 **Exception Handling:**
 
@@ -959,6 +962,7 @@ Giáo viên chủ nhiệm tạo nhận xét cho học sinh trong lớp với th�
 | EX-013-02 | Thời gian gửi đã qua khi lưu | Hiển thị MSG-013-03 |
 | EX-013-03 | Gửi thông báo thất bại (lỗi hệ thống) | BRD không đề cập |
 | EX-013-04 | Xóa nhận xét | BRD không đề cập |
+| EX-013-05 | Thêm mới hoặc chỉnh sửa nhận xét khi năm học đã kết thúc | Hiển thị MSG-013-06, không thực hiện thao tác |
 
 ---
 
@@ -1002,6 +1006,7 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 |---|---|---|
 | MSG-014-01 | "Vui lòng chọn hệ số điểm" | Chưa chọn hệ số |
 | MSG-014-02 | "Điểm không hợp lệ" | Điểm nhập sai format |
+| MSG-014-03 | "Năm học đã kết thúc, không thể chỉnh sửa điểm" | Thao tác sửa điểm khi năm học đã kết thúc |
 
 **Business Rules:**
 
@@ -1012,6 +1017,7 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 | BR-014-03 | Chỉnh sửa điểm trực tiếp trên bảng (inline editing), sau đó nhấn nút "Lưu" |
 | BR-014-04 | Sau khi nhấn "Lưu", hệ thống lưu điểm và tính toán lại ĐTB |
 | BR-014-05 | Thêm cột điểm mới qua nút "Thêm điểm", chọn hệ số tại title cột |
+| BR-014-06 | Khi năm học ở trạng thái "Đã kết thúc": không được thêm cột điểm mới hoặc chỉnh sửa điểm thuộc năm học đó (BR-003-03) |
 
 > **Lưu ý:** BRD không đề cập: thang điểm (0-10 hay 0-100), các giá trị hệ số cụ thể (1, 2, 3...), số lượng cột điểm tối đa, cột điểm có tên không. **BRD không đề cập.**
 
@@ -1021,6 +1027,7 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 |---|---|---|
 | EX-014-01 | Xóa cột điểm đã có dữ liệu | BRD không đề cập |
 | EX-014-02 | Nhập điểm ngoài thang | BRD không đề cập thang điểm |
+| EX-014-03 | Thêm cột điểm hoặc chỉnh sửa điểm khi năm học đã kết thúc | Hiển thị MSG-014-03, không thực hiện thao tác |
 
 ---
 
