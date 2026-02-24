@@ -76,7 +76,7 @@ erDiagram
     comments ||--o{ notifications : "1 nhận xét - N thông báo"
     users ||--o{ notifications : "1 user - N thông báo"
 
-    students ||--|| parents : "1 HS - 1 phụ huynh"
+    parents ||--o{ students : "1 PH - N học sinh (nhiều con)"
 
     users ||--o{ password_reset_tokens : "1 user - N token reset"
 ```
@@ -265,7 +265,7 @@ erDiagram
 
 ### 3.6 `students` – Học sinh
 
-**Mô tả:** Bảng chứa thông tin profile học sinh. Mỗi học sinh liên kết 1:1 với record `users` (role = `student`) và 1:1 với record `parents`.
+**Mô tả:** Bảng chứa thông tin profile học sinh. Mỗi học sinh liên kết 1:1 với record `users` (role = `student`) và N:1 với record `parents` (nhiều học sinh có thể cùng 1 phụ huynh).
 
 **Nguồn:** BRD 4.2.4 | SRS FR-006
 
@@ -279,6 +279,7 @@ erDiagram
 | `date_of_birth` | DATE | NOT NULL | - | Ngày sinh |
 | `address` | VARCHAR(500) | NOT NULL | - | Địa chỉ |
 | `gender` | ENUM | NOT NULL | - | Giới tính |
+| `parent_id` | FK → parents.id | NOT NULL | - | Phụ huynh liên kết (N học sinh → 1 phụ huynh) |
 | `study_status` | ENUM | NOT NULL | - | Trạng thái học tập: `studying` / `dropped_out` |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
@@ -288,6 +289,7 @@ erDiagram
 - `UQ`: `student_code` (mã học sinh unique toàn hệ thống)
 - `FK`: `user_id` → `users.id`
 - `FK`: `school_id` → `schools.id`
+- `FK`: `parent_id` → `parents.id`
 - `UQ`: `user_id`
 
 **Mapping giá trị study_status:**
@@ -312,13 +314,14 @@ erDiagram
 
 **Business Rules liên quan:**
 - BR-006-01: `student_code` là duy nhất, hệ thống tự tạo theo format `[Mã trường][Năm nhập học][Số thứ tự]`. Số thứ tự reset mỗi năm
+- BR-006-05: `parent_id` liên kết học sinh với phụ huynh. Nhiều học sinh có thể cùng `parent_id` (anh chị em)
 - BR-008-02: Khi lọc HS thêm vào lớp → `WHERE study_status = 'studying'`
 
 ---
 
 ### 3.7 `parents` – Phụ huynh
 
-**Mô tả:** Bảng chứa thông tin phụ huynh. Mỗi phụ huynh gắn với 1 học sinh và có tài khoản đăng nhập riêng (role = `parent`).
+**Mô tả:** Bảng chứa thông tin phụ huynh. 1 phụ huynh có thể liên kết với nhiều học sinh (nhiều con). Nếu email phụ huynh đã tồn tại khi tạo học sinh mới, tài khoản phụ huynh được tái sử dụng thay vì tạo thêm.
 
 **Nguồn:** BRD 4.2.4 | SRS FR-006
 
@@ -326,7 +329,6 @@ erDiagram
 |---|---|---|---|---|
 | `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính |
 | `user_id` | FK → users.id | NOT NULL | UQ | Tài khoản đăng nhập phụ huynh |
-| `student_id` | FK → students.id | NOT NULL | UQ | Học sinh liên kết (quan hệ 1:1) |
 | `father_name` | VARCHAR(255) | NOT NULL | - | Họ tên cha |
 | `father_occupation` | VARCHAR(255) | NOT NULL | - | Nghề nghiệp cha |
 | `father_date_of_birth` | DATE | NOT NULL | - | Ngày sinh cha |
@@ -341,15 +343,15 @@ erDiagram
 **Constraints:**
 - `PK`: `id`
 - `FK`: `user_id` → `users.id`
-- `FK`: `student_id` → `students.id`
-- `UQ`: `user_id`
-- `UQ`: `student_id` (1 HS chỉ có 1 bản ghi PH)
+- `UQ`: `user_id` (1 user → 1 bản ghi phụ huynh)
 
-> **Lưu ý:** BRD có đầy đủ thông tin ngày sinh và số điện thoại cho cả cha và mẹ.
+> **Lưu ý:** BRD có đầy đủ thông tin ngày sinh và số điện thoại cho cả cha và mẹ. Danh sách học sinh liên kết với phụ huynh được truy vấn ngược qua `students.parent_id`.
 
 **Business Rules liên quan:**
-- BR-006-02: Thông tin phụ huynh lưu kèm học sinh → liên kết qua `student_id`
+- BR-006-02: Thông tin phụ huynh lưu kèm học sinh → học sinh liên kết qua `students.parent_id`
 - BR-006-03: Phụ huynh có tài khoản riêng → `user_id` liên kết đến `users`
+- BR-006-05: 1 `parents` record có thể có nhiều `students` liên kết (N:1)
+- BR-006-07: Khi tạo học sinh, kiểm tra `users.email` của phụ huynh: đã tồn tại → lấy `parents` record tương ứng để gán `students.parent_id`
 
 ---
 
@@ -642,7 +644,7 @@ GROUP BY s.student_id;
 | 5 | `users` → `teachers` | 1:1 | 1 user (role teacher) ↔ 1 teacher | `teachers.user_id` UQ FK |
 | 6 | `users` → `students` | 1:1 | 1 user (role student) ↔ 1 student | `students.user_id` UQ FK |
 | 7 | `users` → `parents` | 1:1 | 1 user (role parent) ↔ 1 parent | `parents.user_id` UQ FK |
-| 8 | `students` → `parents` | 1:1 | 1 học sinh ↔ 1 phụ huynh | `parents.student_id` UQ FK |
+| 8 | `parents` → `students` | 1:N | 1 phụ huynh có thể liên kết nhiều học sinh (nhiều con) | `students.parent_id` FK |
 | 9 | `academic_years` → `subjects` | 1:N | 1 năm học có nhiều môn | `subjects.academic_year_id` FK |
 | 10 | `academic_years` → `classes` | 1:N | 1 năm học có nhiều lớp | `classes.academic_year_id` FK |
 | 11 | `teachers` → `classes` | 1:1 (per year) | 1 GV chủ nhiệm tối đa 1 lớp / năm | `classes` UQ(academic_year_id, homeroom_teacher_id) |

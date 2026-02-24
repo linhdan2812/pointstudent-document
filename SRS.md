@@ -464,19 +464,30 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 ### FR-006: Quản lý học sinh
 
 **Mô tả chức năng:**
-Admin School quản lý danh sách học sinh trong trường. Thông tin học sinh bao gồm cả thông tin phụ huynh (cha, mẹ). Phụ huynh có tài khoản riêng để đăng nhập hệ thống.
+Admin School quản lý danh sách học sinh trong trường. Thông tin học sinh bao gồm cả thông tin phụ huynh (cha, mẹ). Khi tạo học sinh, hệ thống kiểm tra email phụ huynh để quyết định tạo mới hay liên kết với tài khoản phụ huynh đã có. Cả học sinh và phụ huynh (nếu mới) đều nhận email thiết lập mật khẩu sau khi tạo.
 
 **Actor:** Admin School
 
 **Business Flow:**
 
-*Thêm học sinh:*
+*Thêm học sinh – Email phụ huynh chưa tồn tại:*
 1. Admin School chọn chức năng thêm học sinh
-2. Nhập thông tin học sinh và thông tin phụ huynh
+2. Nhập thông tin học sinh và thông tin phụ huynh (không có trường mật khẩu)
 3. Hệ thống validate dữ liệu
-4. Hệ thống tạo tài khoản đăng nhập cho học sinh (email + mật khẩu)
-5. Hệ thống tạo tài khoản đăng nhập cho phụ huynh (email + mật khẩu)
-6. Lưu thông tin và hiển thị thông báo thành công
+4. Hệ thống kiểm tra email phụ huynh → không tìm thấy trong hệ thống
+5. Hệ thống tạo tài khoản học sinh (chưa có mật khẩu) và tài khoản phụ huynh (chưa có mật khẩu)
+6. Hệ thống gửi email thiết lập mật khẩu đến email học sinh
+7. Hệ thống gửi email thiết lập mật khẩu đến email phụ huynh
+8. Lưu thông tin và hiển thị thông báo thành công
+
+*Thêm học sinh – Email phụ huynh đã tồn tại:*
+1. Admin School chọn chức năng thêm học sinh
+2. Nhập thông tin học sinh và thông tin phụ huynh (không có trường mật khẩu)
+3. Hệ thống validate dữ liệu
+4. Hệ thống kiểm tra email phụ huynh → tìm thấy tài khoản phụ huynh đã có
+5. Hệ thống tạo tài khoản học sinh (chưa có mật khẩu), liên kết học sinh với tài khoản phụ huynh đã có (không tạo mới)
+6. Hệ thống gửi email thiết lập mật khẩu đến email học sinh (không gửi email cho phụ huynh)
+7. Lưu thông tin và hiển thị thông báo thành công
 
 *Xem / Sửa học sinh:*
 1. Admin School chọn học sinh trong danh sách
@@ -494,8 +505,7 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | Ngày sinh | Date | Có | Ngày sinh |
 | Địa chỉ | String | Có | Địa chỉ |
 | Giới tính | Enum | Có | Giới tính |
-| Email đăng nhập | String (Email) | Có | Email để đăng nhập hệ thống |
-| Mật khẩu | String | Có | Mật khẩu đăng nhập |
+| Email đăng nhập | String (Email) | Có | Email để đăng nhập hệ thống. Sau khi tạo, hệ thống gửi email thiết lập mật khẩu |
 | Trạng thái học | Enum | Có | Đang học / Đã nghỉ |
 
 *Thông tin phụ huynh:*
@@ -509,9 +519,8 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | Nghề nghiệp mẹ | String | Có | Nghề nghiệp người mẹ |
 | Ngày sinh mẹ | Date | Có | Ngày sinh người mẹ |
 | Số điện thoại mẹ | String | Có | Số điện thoại người mẹ |
-| Email đăng nhập | String (Email) | Có | Email để phụ huynh đăng nhập |
+| Email đăng nhập | String (Email) | Có | Email để phụ huynh đăng nhập. Hệ thống tự tra cứu: nếu chưa tồn tại → tạo mới; nếu đã tồn tại → liên kết |
 | Số điện thoại | String | Có | Số điện thoại liên lạc chung |
-| Mật khẩu | String | Có | Mật khẩu đăng nhập |
 
 > **Lưu ý:** Không rõ "Bắt buộc" hay "Không bắt buộc" cho từng trường. Các trường trên được suy luận là bắt buộc do BRD liệt kê chúng. **Cần xác nhận lại với stakeholder.**
 
@@ -526,10 +535,9 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | VR-006-01 | Họ tên học sinh không được để trống | Bắt buộc |
 | VR-006-02 | Ngày sinh không được để trống | Bắt buộc |
 | VR-006-03 | Email đăng nhập học sinh không được để trống, đúng format | Bắt buộc |
-| VR-006-04 | Mật khẩu học sinh không được để trống | Bắt buộc |
-| VR-006-05 | Thông tin phụ huynh đầy đủ | Bắt buộc |
-| VR-006-06 | Email đăng nhập phụ huynh không được để trống, đúng format | Bắt buộc |
-| VR-006-07 | Số điện thoại phụ huynh không được để trống | Bắt buộc |
+| VR-006-04 | Thông tin phụ huynh đầy đủ | Bắt buộc |
+| VR-006-05 | Email đăng nhập phụ huynh không được để trống, đúng format | Bắt buộc |
+| VR-006-06 | Số điện thoại phụ huynh không được để trống | Bắt buộc |
 
 **Message Validation:**
 
@@ -539,8 +547,9 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | MSG-006-02 | "Vui lòng nhập ngày sinh" | Ngày sinh để trống |
 | MSG-006-03 | "Vui lòng nhập email đăng nhập" | Email để trống |
 | MSG-006-04 | "Email không đúng định dạng" | Email sai format |
-| MSG-006-05 | "Vui lòng nhập mật khẩu" | Mật khẩu để trống |
-| MSG-006-06 | "Vui lòng nhập thông tin phụ huynh" | Thiếu thông tin phụ huynh |
+| MSG-006-05 | "Vui lòng nhập thông tin phụ huynh" | Thiếu thông tin phụ huynh |
+| MSG-006-06 | "Vui lòng nhập email phụ huynh" | Email phụ huynh để trống |
+| MSG-006-07 | "Email phụ huynh không đúng định dạng" | Email phụ huynh sai format |
 
 **Business Rules:**
 
@@ -550,6 +559,9 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 | BR-006-02 | Thông tin phụ huynh được lưu kèm theo thông tin học sinh |
 | BR-006-03 | Phụ huynh có tài khoản riêng để đăng nhập hệ thống |
 | BR-006-04 | Học sinh có tài khoản riêng để đăng nhập hệ thống |
+| BR-006-05 | Khi tạo học sinh, hệ thống kiểm tra email phụ huynh: nếu chưa tồn tại → tạo mới tài khoản phụ huynh; nếu đã tồn tại → liên kết học sinh với tài khoản phụ huynh hiện có, không tạo thêm |
+| BR-006-06 | Sau khi tạo học sinh: luôn gửi email thiết lập mật khẩu đến email học sinh. Chỉ gửi email thiết lập mật khẩu đến email phụ huynh nếu tài khoản phụ huynh vừa được tạo mới |
+| BR-006-07 | 1 tài khoản phụ huynh có thể liên kết với nhiều học sinh (nhiều con) |
 
 > **Lưu ý:** Trạng thái học gồm 2 giá trị: "Đang học" và "Đã nghỉ".
 
@@ -557,8 +569,8 @@ Admin School quản lý danh sách học sinh trong trường. Thông tin học 
 
 | STT | Exception | Xử lý |
 |---|---|---|
-| EX-006-01 | Email học sinh trùng | BRD không đề cập |
-| EX-006-02 | Email phụ huynh trùng | BRD không đề cập |
+| EX-006-01 | Email học sinh đã tồn tại trong hệ thống | BRD không đề cập cách xử lý |
+| EX-006-02 | Email phụ huynh đã tồn tại → liên kết học sinh với tài khoản phụ huynh hiện có (BR-006-05), không báo lỗi |
 | EX-006-03 | Xóa học sinh đang thuộc lớp | BRD không đề cập |
 
 ---
@@ -1070,21 +1082,33 @@ Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
 ### FR-016: Cổng thông tin phụ huynh
 
 **Mô tả chức năng:**
-Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của con mình.
+Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của con mình. Nếu phụ huynh có nhiều con trong hệ thống, phụ huynh chọn từng con từ dashboard để xem thông tin.
 
 **Actor:** Phụ huynh
 
 **Business Flow:**
+
+*Phụ huynh có 1 con:*
 1. Phụ huynh đăng nhập hệ thống
-2. Hệ thống hiển thị thông tin điểm và nhận xét của con
-3. Phụ huynh nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
+2. Hệ thống tự động hiển thị bảng điểm và nhận xét của con
+
+*Phụ huynh có nhiều con:*
+1. Phụ huynh đăng nhập hệ thống
+2. Hệ thống hiển thị danh sách các con đang liên kết với tài khoản phụ huynh
+3. Phụ huynh chọn 1 con từ danh sách
+4. Hệ thống hiển thị bảng điểm và nhận xét của con được chọn
+5. Phụ huynh có thể quay lại và chọn con khác
 
 **Input Data:**
-- Không có input (chỉ xem)
+
+| Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
+|---|---|---|---|
+| Học sinh được chọn | Reference | Không (chỉ khi có nhiều con) | Chọn học sinh từ danh sách các con |
 
 **Output Data:**
-- Bảng điểm của con (theo môn, theo lớp)
-- Danh sách nhận xét từ giáo viên
+- Danh sách các con liên kết với tài khoản (hiển thị khi có nhiều con)
+- Bảng điểm của con được chọn (theo môn, theo lớp)
+- Danh sách nhận xét từ giáo viên của con được chọn
 - Email thông báo nhận xét mới
 
 **Validation Rules:**
@@ -1097,9 +1121,11 @@ Phụ huynh đăng nhập hệ thống để xem điểm và nhận xét của c
 
 | STT | Rule |
 |---|---|
-| BR-016-01 | Phụ huynh chỉ xem được thông tin của con mình |
+| BR-016-01 | Phụ huynh chỉ xem được thông tin của các con liên kết với tài khoản mình |
 | BR-016-02 | Phụ huynh nhận email thông báo khi nhận xét được gửi. Tiêu đề: "Nhận xét mới từ giáo viên". Nội dung: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." |
 | BR-016-03 | Phụ huynh chỉ có quyền xem, không có quyền chỉnh sửa |
+| BR-016-04 | Nếu phụ huynh có 1 con: tự động hiển thị thông tin con đó sau khi đăng nhập |
+| BR-016-05 | Nếu phụ huynh có nhiều con: hiển thị danh sách các con để chọn trước khi xem chi tiết |
 
 **Exception Handling:**
 

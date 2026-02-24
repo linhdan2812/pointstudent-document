@@ -155,7 +155,6 @@ Hệ thống bao gồm:
 - Địa chỉ
 - Giới tính
 - Email đăng nhập
-- Mật khẩu
 - ID: hệ thống tự tạo theo format: Mã trường + Năm nhập học (năm hiện tại khi tạo học sinh) + Số thứ tự tăng dần (mỗi năm reset lại từ 1). Ví dụ: `TH012025001`, `TH012025002`
 - Trạng thái học:
   - Đang học
@@ -169,9 +168,14 @@ Hệ thống bao gồm:
 - Nghề nghiệp mẹ
 - Ngày sinh mẹ
 - Số điện thoại mẹ
-- Email đăng nhập
+- Email đăng nhập (dùng để tra cứu và đăng nhập)
 - Số điện thoại
-- Mật khẩu
+
+### Quy tắc tạo tài khoản khi thêm học sinh
+- Học sinh không nhập mật khẩu khi tạo mới. Sau khi tạo xong, hệ thống gửi email đến địa chỉ email của học sinh để thiết lập mật khẩu lần đầu. Học sinh phải thiết lập mật khẩu trước khi đăng nhập
+- Khi tạo học sinh, hệ thống kiểm tra email phụ huynh:
+  - Nếu email phụ huynh **chưa tồn tại**: tạo mới tài khoản phụ huynh (không có mật khẩu), gửi email thiết lập mật khẩu đến cả email học sinh và email phụ huynh
+  - Nếu email phụ huynh **đã tồn tại**: không tạo thêm tài khoản phụ huynh, liên kết học sinh mới với tài khoản phụ huynh hiện có. Chỉ gửi email thiết lập mật khẩu đến email học sinh
 
 ---
 
@@ -308,10 +312,12 @@ Trong đó `(1 + 1 + 1 + 2 + 2 + 3) = 10` là tổng hệ số.
 
 ### Chức năng
 - Phụ huynh sau khi đăng nhập chỉ có thể xem bảng điểm và nhận xét về con của mình
+- Nếu phụ huynh có nhiều con trong hệ thống, hiển thị danh sách các con để chọn xem
 - Nhận thông báo qua email đã đăng ký khi có nhận xét mới từ giáo viên
 
 ### Quy tắc
-- Phụ huynh chỉ xem được thông tin của con mình
+- Phụ huynh chỉ xem được thông tin của các con mình
+- Nếu có nhiều con: phụ huynh chọn từng con trong dashboard để xem bảng điểm và nhận xét của con đó
 - Không có quyền chỉnh sửa bất kỳ thông tin nào
 
 ---
