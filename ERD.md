@@ -134,18 +134,20 @@ erDiagram
 |---|---|---|---|---|
 | `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính |
 | `name` | VARCHAR(255) | NOT NULL | - | Tên trường học |
-| `school_code` | VARCHAR(50) | NOT NULL | UQ | Mã trường – duy nhất toàn hệ thống, Admin System tự nhập |
+| `school_code` | VARCHAR(8) | NOT NULL | UQ | Mã trường – duy nhất toàn hệ thống, Admin System tự nhập. Tối đa 8 ký tự, chỉ chữ cái và chữ số |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
 
 **Constraints:**
 - `PK`: `id`
 - `UQ`: `school_code` (mã trường unique toàn hệ thống)
+- `CHECK`: `school_code` ~ `^[a-zA-Z0-9]{1,8}$` (chỉ chữ cái và chữ số, tối đa 8 ký tự)
 
 **Business Rules liên quan:**
 - BR-002-01: Khi INSERT vào `schools` → trigger tạo 1 record trong `users` với role = `admin_school` và `school_id` = id trường vừa tạo
 - BR-002-02: `school_code` UNIQUE toàn hệ thống
 - BR-002-03: `school_code` do Admin System tự nhập
+- BR-002-04: `school_code` tối đa 8 ký tự, chỉ chữ cái và chữ số (regex: `^[a-zA-Z0-9]{1,8}$`)
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin adminstpoint@gmail.com / adminstpoiNt1122@ là của Admin System, không phải Admin School. **Cần làm rõ cơ chế generate tài khoản Admin School với stakeholder.**
 

@@ -91,13 +91,14 @@ Hệ thống bao gồm:
 
 ### Thông tin
 - Tên trường
-- Mã trường (Unique, có thể tự nhập)
+- Mã trường (Unique, có thể tự nhập, tối đa 8 ký tự, chỉ bao gồm chữ và số)
 
 ### Chức năng
 - CRUD trường học
 
 ### Quy tắc nghiệp vụ
 - Mã trường là duy nhất trong hệ thống, Admin System có thể tự nhập
+- Mã trường tối đa 8 ký tự, chỉ bao gồm chữ cái và chữ số (không có ký tự đặc biệt, khoảng trắng)
 - Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó
 
 ---

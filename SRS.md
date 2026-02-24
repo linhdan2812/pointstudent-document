@@ -183,7 +183,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | Trường | Kiểu dữ liệu | Bắt buộc | Unique | Mô tả |
 |---|---|---|---|---|
 | Tên trường | String | Có | Không | Tên trường học |
-| Mã trường | String | Có | Có | Mã trường học, Admin System có thể tự nhập |
+| Mã trường | String | Có | Có | Mã trường học, Admin System có thể tự nhập. Tối đa 8 ký tự, chỉ bao gồm chữ và số |
 
 **Output Data:**
 - Danh sách trường học
@@ -196,6 +196,8 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | VR-002-01 | Tên trường không được để trống | Bắt buộc |
 | VR-002-02 | Mã trường không được để trống | Bắt buộc |
 | VR-002-03 | Mã trường phải duy nhất trong hệ thống | Unique constraint |
+| VR-002-04 | Mã trường tối đa 8 ký tự | Giới hạn độ dài |
+| VR-002-05 | Mã trường chỉ bao gồm chữ cái và chữ số (không có ký tự đặc biệt, khoảng trắng) | Format constraint |
 
 **Message Validation:**
 
@@ -204,6 +206,8 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | MSG-002-01 | "Vui lòng nhập tên trường" | Tên trường để trống |
 | MSG-002-02 | "Vui lòng nhập mã trường" | Mã trường để trống |
 | MSG-002-03 | "Mã trường đã tồn tại trong hệ thống" | Mã trường trùng |
+| MSG-002-04 | "Mã trường không được vượt quá 8 ký tự" | Mã trường quá 8 ký tự |
+| MSG-002-05 | "Mã trường chỉ được chứa chữ cái và chữ số" | Mã trường có ký tự đặc biệt hoặc khoảng trắng |
 
 **Business Rules:**
 
@@ -212,6 +216,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | BR-002-01 | Khi tạo trường học, hệ thống tự động tạo tài khoản Admin School theo trường học đó |
 | BR-002-02 | Mã trường là duy nhất (unique) trên toàn hệ thống |
 | BR-002-03 | Mã trường do Admin System tự nhập |
+| BR-002-04 | Mã trường tối đa 8 ký tự, chỉ bao gồm chữ cái và chữ số (regex: `^[a-zA-Z0-9]{1,8}$`) |
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin đăng nhập adminstpoint@gmail.com / adminstpoiNt1122@ là tài khoản của Admin System, không phải Admin School. **Cần làm rõ cơ chế tạo tài khoản Admin School với stakeholder.**
 
@@ -220,6 +225,8 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | STT | Exception | Xử lý |
 |---|---|---|
 | EX-002-01 | Mã trường trùng | Hiển thị MSG-002-03, không cho phép lưu |
+| EX-002-03 | Mã trường quá 8 ký tự | Hiển thị MSG-002-04, không cho phép lưu |
+| EX-002-04 | Mã trường chứa ký tự không hợp lệ | Hiển thị MSG-002-05, không cho phép lưu |
 | EX-002-02 | Không thể tạo tài khoản Admin School | BRD không đề cập |
 
 ---
