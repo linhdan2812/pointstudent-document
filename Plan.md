@@ -103,3 +103,30 @@ Flow: Dev → Test → Fix Bug → Verify Bug
 - Fix Bug: 48h
 - Verify Bug: 27h
 - **Overall: 317h**
+
+
+---
+
+## 7. Bảng viết tắt (Glossary)
+
+| Từ viết tắt | Ý nghĩa |
+|---|---|
+| PM | Project Manager – Quản lý dự án |
+| BA | Business Analyst – Phân tích nghiệp vụ |
+| FR | Functional Requirement – Yêu cầu chức năng |
+| SRS | Software Requirements Specification |
+| ET | Estimation – Ước lượng effort |
+| CRUD | Create – Read – Update – Delete |
+| HS | Học sinh |
+| PH | Phụ huynh |
+| GV | Giáo viên |
+| GVCN | Giáo viên chủ nhiệm |
+| GVBM | Giáo viên bộ môn |
+| CN | Chủ nhiệm |
+| BM | Bộ môn |
+| ĐTB | Điểm trung bình |
+| UI | User Interface – Giao diện người dùng |
+| API | Application Programming Interface |
+| DoD | Definition of Done – Điều kiện hoàn thành |
+| Sprint | Chu kỳ phát triển trong Agile |
+
