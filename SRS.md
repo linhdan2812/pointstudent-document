@@ -1124,6 +1124,99 @@ Học sinh đăng nhập hệ thống để xem điểm và nhận xét cá nhâ
 
 ---
 
+### FR-018: Quên mật khẩu
+
+**Mô tả chức năng:**
+Tại màn hình đăng nhập, người dùng có thể yêu cầu đặt lại mật khẩu thông qua link "Quên mật khẩu". Hệ thống gửi email chứa link đặt lại mật khẩu. Link có hiệu lực trong 15 phút.
+
+**Actor:** Admin System, Admin School, Giáo viên, Phụ huynh, Học sinh
+
+**Business Flow:**
+
+*Yêu cầu đặt lại mật khẩu:*
+1. Người dùng nhấn link "Quên mật khẩu" tại màn hình đăng nhập
+2. Hệ thống hiển thị form nhập email
+3. Người dùng nhập email đã đăng ký
+4. Hệ thống kiểm tra email tồn tại trong hệ thống
+5. Nếu email tồn tại → hệ thống tạo token đặt lại mật khẩu và gửi email chứa link đặt lại
+6. Hiển thị thông báo "Vui lòng kiểm tra email để đặt lại mật khẩu"
+
+*Đặt lại mật khẩu:*
+1. Người dùng nhấn vào link trong email
+2. Hệ thống kiểm tra token còn hiệu lực (trong 15 phút)
+3. Nếu token hợp lệ → hiển thị form nhập mật khẩu mới
+4. Người dùng nhập mật khẩu mới và xác nhận mật khẩu mới
+5. Hệ thống cập nhật mật khẩu và chuyển về màn hình đăng nhập
+6. Hiển thị thông báo "Đặt lại mật khẩu thành công"
+
+**Input Data:**
+
+*Form yêu cầu đặt lại:*
+
+| Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
+|---|---|---|---|
+| Email | String (Email) | Có | Email đã đăng ký trong hệ thống |
+
+*Form đặt lại mật khẩu:*
+
+| Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
+|---|---|---|---|
+| Mật khẩu mới | String | Có | Mật khẩu mới |
+| Xác nhận mật khẩu mới | String | Có | Nhập lại mật khẩu mới để xác nhận |
+
+**Output Data:**
+- Email chứa link đặt lại mật khẩu
+- Thông báo kết quả (thành công / thất bại)
+
+**Validation Rules:**
+
+| STT | Rule | Mô tả |
+|---|---|---|
+| VR-018-01 | Email không được để trống | Bắt buộc |
+| VR-018-02 | Email phải đúng định dạng | Format email |
+| VR-018-03 | Mật khẩu mới không được để trống | Bắt buộc |
+| VR-018-04 | Xác nhận mật khẩu mới không được để trống | Bắt buộc |
+| VR-018-05 | Mật khẩu mới và xác nhận mật khẩu phải trùng khớp | Logic kiểm tra |
+
+**Message Validation:**
+
+| Code | Message | Điều kiện |
+|---|---|---|
+| MSG-018-01 | "Vui lòng nhập email" | Email để trống |
+| MSG-018-02 | "Email không đúng định dạng" | Email sai format |
+| MSG-018-03 | "Vui lòng kiểm tra email để đặt lại mật khẩu" | Email tồn tại trong hệ thống, đã gửi email |
+| MSG-018-04 | "Email không tồn tại trong hệ thống" | Email không tìm thấy |
+| MSG-018-05 | "Vui lòng nhập mật khẩu mới" | Mật khẩu mới để trống |
+| MSG-018-06 | "Vui lòng xác nhận mật khẩu mới" | Xác nhận mật khẩu để trống |
+| MSG-018-07 | "Mật khẩu mới và xác nhận mật khẩu không trùng khớp" | 2 trường mật khẩu khác nhau |
+| MSG-018-08 | "Đặt lại mật khẩu thành công" | Cập nhật mật khẩu thành công |
+| MSG-018-09 | "Link đặt lại mật khẩu đã hết hạn" | Token hết hiệu lực (quá 15 phút) |
+| MSG-018-10 | Tiêu đề email: "Đặt lại mật khẩu" | Tiêu đề email gửi đến người dùng |
+| MSG-018-11 | Nội dung email: "Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng nhấn vào link bên dưới để đặt lại mật khẩu. Link có hiệu lực trong 15 phút." | Nội dung email gửi đến người dùng |
+
+**Business Rules:**
+
+| STT | Rule |
+|---|---|
+| BR-018-01 | Link đặt lại mật khẩu có hiệu lực trong 15 phút kể từ khi gửi |
+| BR-018-02 | Sau khi đặt lại mật khẩu thành công, token bị vô hiệu hóa (không dùng lại được) |
+| BR-018-03 | Tiêu đề email: "Đặt lại mật khẩu" |
+| BR-018-04 | Nội dung email: "Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng nhấn vào link bên dưới để đặt lại mật khẩu. Link có hiệu lực trong 15 phút." |
+| BR-018-05 | Sau khi đặt lại thành công, chuyển về màn hình đăng nhập |
+| BR-018-06 | Chức năng áp dụng cho tất cả role trong hệ thống |
+
+**Exception Handling:**
+
+| STT | Exception | Xử lý |
+|---|---|---|
+| EX-018-01 | Email không tồn tại trong hệ thống | Hiển thị MSG-018-04 |
+| EX-018-02 | Link đặt lại mật khẩu đã hết hạn (quá 15 phút) | Hiển thị MSG-018-09 |
+| EX-018-03 | Token đã được sử dụng | Hiển thị MSG-018-09 |
+| EX-018-04 | Mật khẩu mới và xác nhận không trùng khớp | Hiển thị MSG-018-07 |
+| EX-018-05 | Gửi email thất bại (lỗi hệ thống) | Hiển thị thông báo lỗi hệ thống |
+
+---
+
 ## 5. Non-functional Requirements
 
 | STT | Loại | Yêu cầu | Ghi chú |

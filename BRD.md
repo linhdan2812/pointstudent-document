@@ -60,6 +60,19 @@ Hệ thống bao gồm:
 
 ---
 
+### 3.2 Quên mật khẩu
+
+- Tại màn hình đăng nhập, có link "Quên mật khẩu"
+- Người dùng nhập email đã đăng ký
+- Hệ thống gửi email chứa link đặt lại mật khẩu
+- Tiêu đề email: "Đặt lại mật khẩu"
+- Nội dung email: "Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng nhấn vào link bên dưới để đặt lại mật khẩu. Link có hiệu lực trong 15 phút."
+- Link đặt lại mật khẩu có hiệu lực trong 15 phút
+- Người dùng nhập mật khẩu mới và xác nhận mật khẩu mới
+- Sau khi đặt lại thành công, chuyển về màn hình đăng nhập
+
+---
+
 ## 4. Yêu cầu nghiệp vụ chi tiết
 
 ---

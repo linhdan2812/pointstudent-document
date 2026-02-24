@@ -36,6 +36,7 @@ Tài liệu này mô tả chi tiết mô hình dữ liệu (Entity Relationship 
 | 12 | `scores` | Điểm số của học sinh | BRD 4.3.4, SRS FR-014 |
 | 13 | `comments` | Nhận xét học sinh (do GVCN tạo) | BRD 4.3.3, SRS FR-013 |
 | 14 | `notifications` | Thông báo email gửi đến phụ huynh/học sinh | BRD 4.3.3, SRS FR-013 |
+| 15 | `password_reset_tokens` | Token đặt lại mật khẩu (hiệu lực 15 phút) | BRD 3.2, SRS FR-018 |
 
 ---
 
@@ -76,6 +77,8 @@ erDiagram
     users ||--o{ notifications : "1 user - N thông báo"
 
     students ||--|| parents : "1 HS - 1 phụ huynh"
+
+    users ||--o{ password_reset_tokens : "1 user - N token reset"
 ```
 
 ---
@@ -596,6 +599,33 @@ GROUP BY s.student_id;
 
 ---
 
+### 3.15 `password_reset_tokens` – Token đặt lại mật khẩu
+
+**Mô tả:** Bảng lưu token đặt lại mật khẩu do hệ thống tạo khi người dùng yêu cầu "Quên mật khẩu". Token có hiệu lực 15 phút, chỉ sử dụng được 1 lần.
+
+**Nguồn:** BRD 3.2 | SRS FR-018
+
+| Tên cột | Kiểu dữ liệu | Nullable | Unique | Mô tả |
+|---|---|---|---|---|
+| `id` | UUID / BIGINT | NOT NULL | PK | Khóa chính |
+| `user_id` | FK → users.id | NOT NULL | - | Người dùng yêu cầu đặt lại mật khẩu |
+| `token` | VARCHAR(255) | NOT NULL | UQ | Token ngẫu nhiên duy nhất |
+| `expires_at` | TIMESTAMP | NOT NULL | - | Thời điểm hết hạn (= `created_at` + 15 phút) |
+| `used_at` | TIMESTAMP | NULL | - | Thời điểm token đã được sử dụng. `NULL` = chưa dùng |
+| `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
+
+**Constraints:**
+- `PK`: `id`
+- `FK`: `user_id` → `users.id`
+- `UQ`: `token` (mỗi token là duy nhất)
+
+**Business Rules liên quan:**
+- BR-018-01: Token hết hiệu lực sau 15 phút (`expires_at <= NOW()`)
+- BR-018-02: Sau khi dùng thành công → cập nhật `used_at = NOW()` (không dùng lại được)
+- BR-018-06: Áp dụng cho tất cả role trong hệ thống
+
+---
+
 ## 4. Tổng hợp quan hệ giữa các Entity
 
 | STT | Quan hệ | Loại | Mô tả | Constraint |
@@ -620,6 +650,7 @@ GROUP BY s.student_id;
 | 18 | `students` → `comments` | 1:N | 1 HS nhận nhiều nhận xét | `comments.student_id` FK |
 | 19 | `comments` → `notifications` | 1:N | 1 nhận xét tạo N thông báo (PH + HS) | `notifications.comment_id` FK |
 | 20 | `users` → `notifications` | 1:N | 1 user nhận nhiều thông báo | `notifications.user_id` FK |
+| 21 | `users` → `password_reset_tokens` | 1:N | 1 user có nhiều token reset (mỗi lần yêu cầu tạo 1 token mới) | `password_reset_tokens.user_id` FK |
 
 ---
 
@@ -646,6 +677,8 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 | `comments` | `idx_comments_student_created` (`student_id`, `created_at DESC`) | Lịch sử nhận xét, mới nhất trước |
 | `comments` | `idx_comments_status_scheduled` (`status`, `scheduled_at`) | System job tìm nhận xét cần gửi |
 | `notifications` | `idx_notif_user_read` (`user_id`, `is_read`) | Hiển thị thông báo chưa đọc |
+| `password_reset_tokens` | `idx_prt_token` (`token`) | Tra cứu token khi người dùng click link reset |
+| `password_reset_tokens` | `idx_prt_user` (`user_id`) | Tìm token theo user |
 
 ---
 
