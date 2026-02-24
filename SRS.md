@@ -1290,6 +1290,9 @@ Tại màn hình đăng nhập, người dùng có thể yêu cầu đặt lại
 | NFR-005 | Thông báo | Hệ thống hỗ trợ gửi thông báo qua email đến phụ huynh và học sinh. Tiêu đề: "Nhận xét mới từ giáo viên". Nội dung: "Giáo viên vừa có nhận xét mới về học sinh, hãy truy cập hệ thống để xem chi tiết. Xin chân thành cảm ơn phụ huynh và học sinh đã quan tâm." | Từ BRD mục 4.3.3 |
 | NFR-006 | Giao diện | Hỗ trợ chỉnh sửa điểm trực tiếp trên bảng (inline editing) | Từ BRD mục 4.3.4 |
 | NFR-007 | Giao diện | Hỗ trợ popup chọn học sinh khi thêm vào lớp | Từ BRD mục 4.2.6 |
+| NFR-008 | Công nghệ – FE | Giao diện người dùng sử dụng mô hình Client-side Rendering (CSR) | Yêu cầu kỹ thuật dự án |
+| NFR-009 | Công nghệ – BE | Backend cần hỗ trợ: REST API, phân quyền theo role, cron job tự động, gửi email | Suy luận từ BRD 4.3.3, 3.2, 2.3 |
+| NFR-010 | Công nghệ – DB | Cơ sở dữ liệu phải là hệ quản trị quan hệ (RDBMS), hỗ trợ FK, CHECK constraint, partial unique index | Suy luận từ ERD (15 entity, quan hệ phức tạp) |
 
 > **Lưu ý:** BRD không đề cập các yêu cầu phi chức năng về: hiệu năng cụ thể (response time, concurrent users), khả năng mở rộng, backup/recovery, audit log, trình duyệt hỗ trợ, responsive design, ngôn ngữ hệ thống, kênh gửi thông báo (email, in-app, SMS).
 
@@ -1334,6 +1337,112 @@ Tại màn hình đăng nhập, người dùng có thể yêu cầu đặt lại
 | Q-009 | Có chức năng xóa cho giáo viên, học sinh, lớp, điểm không? | Chưa rõ |
 | ~~Q-010~~ | ~~Chi tiết các trường dữ liệu của trường học (entity School)?~~ | **Đã giải đáp:** Tên trường, Mã trường (unique, tự nhập) |
 | ~~Q-011~~ | ~~Dòng "indicate." ở mục 4.3.2 có ý nghĩa gì?~~ | **Đã giải đáp:** Xem bảng điểm chi tiết của từng học sinh |
+
+---
+
+## 7. Technology Stack
+
+> Phần này ghi nhận các công nghệ được khuyến nghị sử dụng cho dự án, dựa trên phân tích yêu cầu từ BRD v1.1, SRS v1.1 và ERD v1.1.
+
+---
+
+### 7.1 Database: PostgreSQL
+
+**Lý do lựa chọn:**
+
+| Yêu cầu hệ thống | Hỗ trợ từ PostgreSQL |
+|---|---|
+| 15 entity với quan hệ FK phức tạp | RDBMS với đầy đủ hỗ trợ FK, JOIN nhiều bảng |
+| CHECK constraint (`school_code`, `status`, `coefficient > 0`) | Native CHECK constraint |
+| Chỉ 1 năm học `in_progress` / trường (BR-003-01) | Partial Unique Index |
+| ENUM (`role`, `status`, `work_status`, `study_status`) | Native ENUM type |
+| Tìm kiếm tên trường, mã trường (FR-002) | Full-text search, Index support |
+| UUID làm khóa chính | Native UUID type |
+| Tính ĐTB có trọng số (complex JOIN + aggregate) | Hiệu năng cao với complex query |
+
+---
+
+### 7.2 Backend: NestJS (Node.js + TypeScript)
+
+**Framework:** NestJS
+
+**Lý do lựa chọn:**
+
+| Yêu cầu hệ thống | Thư viện / Cơ chế |
+|---|---|
+| Phân quyền 5 role (FR-001, BR-001-01) | `@nestjs/passport` + JWT + Custom `RoleGuard` |
+| Cron job gửi email nhận xét theo lịch (FR-013, BR-013-03) | `@nestjs/schedule` — quét `comments` có `scheduled_at <= NOW()` |
+| Gửi email (thông báo nhận xét + reset password) | `@nestjs-modules/mailer` + Nodemailer |
+| ORM kết nối PostgreSQL | **Prisma** (type-safe, schema-first, dễ migrate) |
+| Validation (VR-xxx trong SRS) | `class-validator` + `class-transformer` |
+| Cấu trúc module theo nghiệp vụ | NestJS Modules (chia theo role / chức năng) |
+
+**Cấu trúc module gợi ý:**
+
+```
+src/
+  auth/             → Đăng nhập, quên mật khẩu (FR-001, FR-018)
+  schools/          → Quản lý trường học (FR-002)
+  academic-years/   → Quản lý năm học (FR-003)
+  subjects/         → Quản lý môn học (FR-004)
+  teachers/         → Quản lý giáo viên (FR-005)
+  students/         → Quản lý học sinh + phụ huynh (FR-006)
+  classes/          → Quản lý lớp học + phân công (FR-007, FR-008, FR-009)
+  scores/           → Quản lý điểm số, tính ĐTB (FR-014, FR-015)
+  comments/         → Quản lý nhận xét + cron job gửi email (FR-013)
+  notifications/    → Lưu log email đã gửi (FR-013)
+  mail/             → Module gửi email dùng chung
+```
+
+**Ghi chú email production:** Khuyến nghị dùng **SendGrid** hoặc **AWS SES** thay vì SMTP thuần để đảm bảo email không vào spam và có tracking trạng thái gửi (cập nhật `notifications.is_sent`, `sent_at`).
+
+---
+
+### 7.3 Frontend: React + Vite (CSR)
+
+**Rendering:** Client-side Rendering (CSR) — theo NFR-008
+
+**Lý do lựa chọn:**
+
+| Thư viện | Mục đích |
+|---|---|
+| **React + Vite** | Framework CSR, build nhanh, hot reload |
+| **Ant Design (antd)** | UI component library — phù hợp hệ thống admin nhiều bảng/form phức tạp |
+| **TanStack Query** | Quản lý server state: fetch API, caching, auto-refetch |
+| **Zustand** | Quản lý client state: thông tin auth, role, con đang chọn (parent portal) |
+| **React Router v6** | Client-side routing theo role |
+
+**Ant Design phù hợp vì:**
+
+| Component antd | Dùng tại màn hình |
+|---|---|
+| `Table` với sort / filter / pagination | Bảng điểm, danh sách HS, GV, trường (FR-002, FR-005, FR-006, FR-015) |
+| Inline editable `Table` | Nhập điểm trực tiếp trên bảng (FR-014) |
+| `Form` + validation | CRUD tất cả entity |
+| `Modal` / `Drawer` | Popup thêm HS vào lớp (FR-008), cảnh báo xóa trường (FR-002 EX-002-05) |
+| `DatePicker`, `TimePicker` | Lên lịch gửi nhận xét (FR-013) |
+| `Select` | Chọn GVCN, GVBM, môn học, năm học |
+| `Select` / `Tabs` chọn con | Parent portal — chọn con để xem điểm (FR-016) |
+
+---
+
+### 7.4 Tổng hợp stack
+
+```
+┌──────────────────────────────────────────────────┐
+│  Frontend (CSR)                                  │
+│  React + Vite + Ant Design                       │
+│  TanStack Query | Zustand | React Router v6      │
+├──────────────────────────────────────────────────┤
+│  Backend                                         │
+│  NestJS (Node.js + TypeScript)                   │
+│  Prisma ORM | JWT Auth | @nestjs/schedule        │
+│  Nodemailer / SendGrid (Email)                   │
+├──────────────────────────────────────────────────┤
+│  Database                                        │
+│  PostgreSQL                                      │
+└──────────────────────────────────────────────────┘
+```
 
 ---
 

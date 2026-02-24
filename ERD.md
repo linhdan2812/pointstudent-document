@@ -11,6 +11,8 @@
 | Người soạn | Business Analyst |
 | Ngày tạo | 13/02/2026 |
 | Phiên bản | 1.1 |
+| RDBMS | PostgreSQL |
+| ORM | Prisma |
 
 ---
 
@@ -705,9 +707,11 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 | 5 | Giá trị `coefficient` chưa rõ phạm vi | Chưa rõ – BRD không liệt kê (1, 2, 3...) |
 | 6 | Cột `score_columns` có cần trường `name` không | Chưa rõ – BRD không đề cập |
 | 7 | Ràng buộc 1 HS / 1 lớp / năm học cần xử lý ở application-level hoặc thêm cột | Xem ghi chú tại `class_students` |
-| 8 | Ràng buộc chỉ 1 năm học `in_progress` / trường cần partial unique index hoặc trigger | DB-specific implementation |
+| ~~8~~ | ~~Ràng buộc chỉ 1 năm học `in_progress` / trường cần partial unique index hoặc trigger~~ | **Đã giải đáp:** Dùng **Partial Unique Index** của PostgreSQL – xem mục 7 SRS |
 | ~~9~~ | ~~Kênh gửi notification (in-app, email, push) chưa rõ~~ | **Đã giải đáp:** Gửi qua email đã đăng ký của phụ huynh và học sinh |
 | 10 | Tài khoản Admin School tạo tự động: email/password mặc định chưa rõ | Chưa rõ – cần confirm stakeholder (adminstpoint@gmail.com là của Admin System) |
+| ~~11~~ | ~~Lựa chọn hệ quản trị cơ sở dữ liệu~~ | **Đã giải đáp:** Sử dụng **PostgreSQL** – xem SRS mục 7.1 |
+| ~~12~~ | ~~ORM kết nối DB~~ | **Đã giải đáp:** Sử dụng **Prisma ORM** – type-safe, schema-first, phù hợp với ERD document này |
 
 ---
 
