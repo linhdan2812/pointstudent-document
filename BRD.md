@@ -95,6 +95,7 @@ Hệ thống bao gồm:
 
 ### Chức năng
 - CRUD trường học
+- Tìm kiếm trường học theo tên trường hoặc mã trường
 
 ### Quy tắc nghiệp vụ
 - Mã trường là duy nhất trong hệ thống, Admin System có thể tự nhập

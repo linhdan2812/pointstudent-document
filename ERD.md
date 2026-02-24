@@ -665,6 +665,8 @@ Dựa trên các query pattern thường gặp từ BRD/SRS:
 
 | Bảng | Index | Lý do |
 |---|---|---|
+| `schools` | `idx_schools_name` (`name`) | Tìm kiếm trường theo tên |
+| `schools` | `idx_schools_school_code` (`school_code`) | Tìm kiếm trường theo mã trường |
 | `users` | `idx_users_email` | Đăng nhập bằng email |
 | `users` | `idx_users_school_role` (`school_id`, `role`) | Lọc user theo trường + role |
 | `academic_years` | `idx_ay_school_status` (`school_id`, `status`) | Tìm năm học đang diễn ra của trường |

@@ -150,7 +150,7 @@ Hệ thống cho phép người dùng đăng nhập bằng email và mật khẩ
 ### FR-002: Quản lý trường học (CRUD)
 
 **Mô tả chức năng:**
-Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem, sửa, xóa. Khi tạo trường học mới, hệ thống tự động tạo tài khoản Admin School tương ứng.
+Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem, sửa, xóa, tìm kiếm. Khi tạo trường học mới, hệ thống tự động tạo tài khoản Admin School tương ứng.
 
 **Actor:** Admin System
 
@@ -168,6 +168,12 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 1. Admin System truy cập trang quản lý trường học
 2. Hệ thống hiển thị danh sách trường học
 
+*Tìm kiếm trường học:*
+1. Admin System nhập từ khóa vào ô tìm kiếm
+2. Hệ thống tìm kiếm theo tên trường hoặc mã trường (không phân biệt hoa thường)
+3. Hệ thống hiển thị danh sách kết quả phù hợp
+4. Nếu không có kết quả → hiển thị thông báo "Không tìm thấy trường học phù hợp"
+
 *Sửa trường học:*
 1. Admin System chọn trường học cần sửa
 2. Cập nhật thông tin
@@ -182,13 +188,21 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 
 **Input Data:**
 
+*Form tạo / sửa trường học:*
+
 | Trường | Kiểu dữ liệu | Bắt buộc | Unique | Mô tả |
 |---|---|---|---|---|
 | Tên trường | String | Có | Không | Tên trường học |
 | Mã trường | String | Có | Có | Mã trường học, Admin System có thể tự nhập. Tối đa 8 ký tự, chỉ bao gồm chữ và số |
 
+*Tìm kiếm:*
+
+| Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
+|---|---|---|---|
+| Từ khóa | String | Không | Tìm theo tên trường hoặc mã trường. Không phân biệt hoa thường |
+
 **Output Data:**
-- Danh sách trường học
+- Danh sách trường học (toàn bộ hoặc theo kết quả tìm kiếm)
 - Tài khoản Admin School được tạo tự động khi thêm trường mới
 
 **Validation Rules:**
@@ -211,6 +225,7 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | MSG-002-04 | "Mã trường không được vượt quá 8 ký tự" | Mã trường quá 8 ký tự |
 | MSG-002-05 | "Mã trường chỉ được chứa chữ cái và chữ số" | Mã trường có ký tự đặc biệt hoặc khoảng trắng |
 | MSG-002-06 | "Không thể xóa trường học này vì đang có giáo viên hoặc học sinh liên quan" | Trường có dữ liệu con (giáo viên, học sinh) |
+| MSG-002-07 | "Không tìm thấy trường học phù hợp" | Từ khóa không khớp với bất kỳ trường nào |
 
 **Business Rules:**
 
@@ -221,6 +236,8 @@ Admin System quản lý danh sách trường học, bao gồm: tạo mới, xem,
 | BR-002-03 | Mã trường do Admin System tự nhập |
 | BR-002-04 | Mã trường tối đa 8 ký tự, chỉ bao gồm chữ cái và chữ số (regex: `^[a-zA-Z0-9]{1,8}$`) |
 | BR-002-05 | Không được xóa trường học nếu trường đó còn giáo viên hoặc học sinh liên quan |
+| BR-002-06 | Tìm kiếm theo tên trường hoặc mã trường, không phân biệt hoa thường (case-insensitive) |
+| BR-002-07 | Ô tìm kiếm để trống → hiển thị toàn bộ danh sách trường học |
 
 > **Lưu ý:** BRD không đề cập chi tiết thông tin tài khoản Admin School được tạo tự động (email, password mặc định). Thông tin đăng nhập adminstpoint@gmail.com / adminstpoiNt1122@ là tài khoản của Admin System, không phải Admin School. **Cần làm rõ cơ chế tạo tài khoản Admin School với stakeholder.**
 
