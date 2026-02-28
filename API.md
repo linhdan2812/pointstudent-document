@@ -33,6 +33,10 @@
 | `POST` | `/teachers` | Tạo giáo viên mới + tài khoản đăng nhập |
 | `GET` | `/teachers/:id` | Lấy chi tiết một giáo viên |
 | `PUT` | `/teachers/:id` | Cập nhật thông tin giáo viên |
+| `GET` | `/students` | Lấy danh sách học sinh của trường (có tìm kiếm, lọc) |
+| `POST` | `/students` | Tạo học sinh mới + tài khoản học sinh & phụ huynh |
+| `GET` | `/students/:id` | Lấy chi tiết một học sinh |
+| `PUT` | `/students/:id` | Cập nhật thông tin học sinh |
 
 ---
 
@@ -70,6 +74,11 @@
   - [POST /teachers](#post-teachers)
   - [GET /teachers/:id](#get-teachersid)
   - [PUT /teachers/:id](#put-teachersid)
+- [Students](#students)
+  - [GET /students](#get-students)
+  - [POST /students](#post-students)
+  - [GET /students/:id](#get-studentsid)
+  - [PUT /students/:id](#put-studentsid)
 
 ---
 
@@ -1492,4 +1501,191 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 **Response 409 – Mã số giáo viên đã tồn tại**
 ```json
 { "success": false, "message": "Mã số giáo viên đã tồn tại trong hệ thống" }
+```
+
+---
+
+## Students
+
+> **Yêu cầu xác thực:** `Authorization: Bearer <token>`
+> **Quyền:** `admin_school` (school_id lấy từ JWT)
+
+### GET /students
+
+Lấy danh sách học sinh của trường. Hỗ trợ tìm kiếm và lọc.
+
+**Query Params**
+
+| Tham số | Kiểu | Bắt buộc | Mô tả |
+|---------|------|----------|-------|
+| `search` | string | Không | Tìm theo họ tên hoặc mã học sinh (không phân biệt hoa thường) |
+| `study_status` | `studying` \| `dropped_out` | Không | Lọc theo trạng thái học |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách học sinh thành công",
+  "data": [
+    {
+      "id": "7f22c1af-...",
+      "student_code": "TSTEST2026001",
+      "full_name": "Nguyễn Văn An",
+      "date_of_birth": "2010-05-15T00:00:00.000Z",
+      "address": "123 Lê Lợi, Quận 1, TP.HCM",
+      "gender": "male",
+      "study_status": "studying",
+      "created_at": "2026-02-28T06:55:30.278Z",
+      "updated_at": "2026-02-28T06:55:30.278Z",
+      "user": { "id": "...", "email": "an.nguyen@student.edu.vn" },
+      "parent": {
+        "id": "...",
+        "father_name": "Nguyễn Văn Bình",
+        "mother_name": "Trần Thị Cúc",
+        "phone": "0987654321",
+        "user": { "id": "...", "email": "phuyhuynh@parent.edu.vn" }
+      }
+    }
+  ]
+}
+```
+
+---
+
+### POST /students
+
+Tạo học sinh mới. Tự động sinh `student_code`, tạo tài khoản học sinh và phụ huynh, gửi email thiết lập mật khẩu.
+
+**Business Rules**
+- `BR-006-01`: `student_code` tự động theo format `[school_code][year][seq]` (ví dụ: `TSTEST2026001`)
+- `BR-006-05`: Email phụ huynh — nếu đã tồn tại và có bản ghi parent → dùng lại; nếu email thuộc tài khoản khác → lỗi 409; nếu chưa tồn tại → tạo mới
+- `BR-006-06`: Gửi email thiết lập mật khẩu cho học sinh (luôn gửi) và phụ huynh (chỉ khi tạo mới), token có hiệu lực 7 ngày
+
+**Request Body**
+
+```json
+{
+  "full_name": "Nguyễn Văn An",
+  "date_of_birth": "2010-05-15",
+  "address": "123 Lê Lợi, Quận 1, TP.HCM",
+  "gender": "male",
+  "email": "an.nguyen@student.edu.vn",
+  "study_status": "studying",
+  "parent": {
+    "email": "phuyhuynh@parent.edu.vn",
+    "phone": "0987654321",
+    "father_name": "Nguyễn Văn Bình",
+    "father_occupation": "Kỹ sư",
+    "father_date_of_birth": "1975-03-10",
+    "mother_name": "Trần Thị Cúc",
+    "mother_occupation": "Kế toán",
+    "mother_date_of_birth": "1978-07-22"
+  }
+}
+```
+
+**Validation Rules**
+
+| Trường | Quy tắc |
+|--------|---------|
+| `full_name` | Bắt buộc |
+| `date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+| `address` | Bắt buộc |
+| `gender` | Bắt buộc, một trong `male` \| `female` \| `other` |
+| `email` | Bắt buộc, đúng định dạng email, duy nhất |
+| `study_status` | Không bắt buộc, mặc định `studying` |
+| `parent.email` | Bắt buộc, đúng định dạng email |
+| `parent.phone` | Bắt buộc, **chỉ được chứa chữ số** |
+| `parent.father_name` | Bắt buộc |
+| `parent.father_occupation` | Bắt buộc |
+| `parent.father_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+| `parent.mother_name` | Bắt buộc |
+| `parent.mother_occupation` | Bắt buộc |
+| `parent.mother_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+
+**Response 201 – Tạo thành công**
+```json
+{
+  "success": true,
+  "message": "Tạo học sinh thành công",
+  "data": {
+    "id": "7f22c1af-...",
+    "student_code": "TSTEST2026001",
+    "full_name": "Nguyễn Văn An",
+    "date_of_birth": "2010-05-15T00:00:00.000Z",
+    "address": "123 Lê Lợi, Quận 1, TP.HCM",
+    "gender": "male",
+    "study_status": "studying",
+    "user": { "id": "...", "email": "an.nguyen@student.edu.vn" },
+    "parent": {
+      "id": "...",
+      "father_name": "Nguyễn Văn Bình",
+      "mother_name": "Trần Thị Cúc",
+      "phone": "0987654321",
+      "user": { "id": "...", "email": "phuyhuynh@parent.edu.vn" }
+    }
+  }
+}
+```
+
+**Response 409 – Email học sinh đã tồn tại**
+```json
+{ "success": false, "message": "Email học sinh đã tồn tại trong hệ thống" }
+```
+
+**Response 409 – Email phụ huynh đã được dùng bởi tài khoản khác**
+```json
+{ "success": false, "message": "Email phụ huynh đã được sử dụng bởi tài khoản khác" }
+```
+
+---
+
+### GET /students/:id
+
+Lấy chi tiết một học sinh theo ID.
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin học sinh thành công",
+  "data": { "id": "7f22c1af-...", "student_code": "TSTEST2026001", "..." }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy học sinh phù hợp" }
+```
+
+---
+
+### PUT /students/:id
+
+Cập nhật thông tin cơ bản của học sinh. Không thể thay đổi email.
+
+**Request Body** (tất cả các trường đều không bắt buộc)
+
+```json
+{
+  "full_name": "Nguyễn Văn An (Updated)",
+  "date_of_birth": "2010-05-15",
+  "address": "456 Nguyễn Huệ, Quận 1, TP.HCM",
+  "gender": "male",
+  "study_status": "dropped_out"
+}
+```
+
+**Response 200 – Cập nhật thành công**
+```json
+{
+  "success": true,
+  "message": "Cập nhật học sinh thành công",
+  "data": { "id": "7f22c1af-...", "..." }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy học sinh phù hợp" }
 ```

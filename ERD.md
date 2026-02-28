@@ -352,7 +352,6 @@ erDiagram
 | `mother_name` | VARCHAR(255) | NOT NULL | - | Họ tên mẹ |
 | `mother_occupation` | VARCHAR(255) | NOT NULL | - | Nghề nghiệp mẹ |
 | `mother_date_of_birth` | DATE | NOT NULL | - | Ngày sinh mẹ |
-| `mother_phone` | VARCHAR(20) | NOT NULL | - | Số điện thoại mẹ |
 | `phone` | VARCHAR(20) | NOT NULL | - | Số điện thoại liên lạc chung |
 | `created_at` | TIMESTAMP | NOT NULL | - | Thời gian tạo |
 | `updated_at` | TIMESTAMP | NOT NULL | - | Thời gian cập nhật |
