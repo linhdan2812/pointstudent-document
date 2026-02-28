@@ -1,5 +1,19 @@
 # TÀI LIỆU ERD – HỆ THỐNG QUẢN LÝ ĐIỂM HỌC SINH
+---
+Run dự án (BE)
+cd "c:/Users/Beannee/Desktop/my-project/Source"
+npm run dev
+http://localhost:3000
+(FE)
+cd "c:/Users/Beannee/Desktop/my-project/Client"
+npm run dev
+http://localhost:5173
 
+Xong. Chạy lệnh sau để xóa data trừ admin system:
+
+
+`cd Source`
+`pm run db:clear`
 ---
 
 ## Thông tin tài liệu
