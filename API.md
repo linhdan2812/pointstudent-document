@@ -1382,6 +1382,7 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 |-------|------|---------------|
 | `full_name` | Bắt buộc | "Vui lòng nhập họ tên" |
 | `date_of_birth` | Bắt buộc, định dạng date | "Vui lòng nhập ngày sinh" |
+| `date_of_birth` | Không được là ngày trong tương lai | "Ngày sinh không được là ngày trong tương lai" |
 | `address` | Bắt buộc | "Vui lòng nhập địa chỉ" |
 | `citizen_id` | Bắt buộc | "Vui lòng nhập số CCCD" |
 | `citizen_id` | Tối đa 12 ký tự | "Số CCCD không được vượt quá 12 ký tự" |
@@ -1589,7 +1590,7 @@ Tạo học sinh mới. Tự động sinh `student_code`, tạo tài khoản h�
 | Trường | Quy tắc |
 |--------|---------|
 | `full_name` | Bắt buộc |
-| `date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+| `date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD`, **không được là ngày trong tương lai** |
 | `address` | Bắt buộc |
 | `gender` | Bắt buộc, một trong `male` \| `female` \| `other` |
 | `email` | Bắt buộc, đúng định dạng email, duy nhất |
@@ -1598,10 +1599,10 @@ Tạo học sinh mới. Tự động sinh `student_code`, tạo tài khoản h�
 | `parent.phone` | Bắt buộc, **chỉ được chứa chữ số** |
 | `parent.father_name` | Bắt buộc |
 | `parent.father_occupation` | Bắt buộc |
-| `parent.father_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+| `parent.father_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD`, **không được là ngày trong tương lai** |
 | `parent.mother_name` | Bắt buộc |
 | `parent.mother_occupation` | Bắt buộc |
-| `parent.mother_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD` |
+| `parent.mother_date_of_birth` | Bắt buộc, định dạng `YYYY-MM-DD`, **không được là ngày trong tương lai** |
 
 **Response 201 – Tạo thành công**
 ```json
