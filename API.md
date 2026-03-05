@@ -37,6 +37,32 @@
 | `POST` | `/students` | Tạo học sinh mới + tài khoản học sinh & phụ huynh |
 | `GET` | `/students/:id` | Lấy chi tiết một học sinh |
 | `PUT` | `/students/:id` | Cập nhật thông tin học sinh |
+| `GET` | `/classes` | Lấy danh sách lớp học (có lọc theo năm học, tìm kiếm) |
+| `POST` | `/classes` | Tạo lớp học mới |
+| `GET` | `/classes/:id` | Lấy chi tiết một lớp học |
+| `PUT` | `/classes/:id` | Cập nhật tên lớp hoặc giáo viên chủ nhiệm |
+| `GET` | `/classes/available-teachers` | Lấy danh sách giáo viên chưa là GVCN trong năm học |
+| `GET` | `/classes/:id/students` | Lấy danh sách học sinh trong lớp |
+| `GET` | `/classes/:id/available-students` | Lấy danh sách học sinh khả dụng để thêm vào lớp |
+| `POST` | `/classes/:id/students` | Thêm học sinh vào lớp (batch) |
+| `DELETE` | `/classes/:id/students/:student_id` | Xóa học sinh khỏi lớp |
+| `GET` | `/classes/:id/assignments` | Lấy danh sách phân công giáo viên bộ môn của lớp |
+| `POST` | `/classes/:id/assignments` | Tạo phân công mới (môn học + giáo viên) |
+| `PUT` | `/classes/:id/assignments/:assignment_id` | Cập nhật giáo viên phụ trách môn học |
+| `DELETE` | `/classes/:id/assignments/:assignment_id` | Xóa phân công |
+| `GET` | `/teacher/dashboard` | Dashboard giáo viên: lớp chủ nhiệm + lớp bộ môn (năm học đang diễn ra) |
+| `GET` | `/teacher/homeroom/:class_id/students` | Lấy danh sách học sinh lớp chủ nhiệm (kèm thông tin đầy đủ) |
+| `GET` | `/teacher/homeroom/:class_id/score-overview` | Bảng điểm tổng hợp (GVCN view): ĐTB từng môn của từng HS |
+| `GET` | `/teacher/homeroom/:class_id/students/:student_id/score-detail` | Bảng điểm chi tiết của một học sinh (GVCN view) |
+| `GET` | `/teacher/homeroom/:class_id/students/:student_id/comments` | Lấy danh sách nhận xét của học sinh |
+| `POST` | `/teacher/homeroom/:class_id/students/:student_id/comments` | Tạo nhận xét mới |
+| `PUT` | `/teacher/homeroom/:class_id/comments/:comment_id` | Cập nhật nhận xét (chỉ khi còn "Đã lên lịch") |
+| `GET` | `/teacher/assignments/:assignment_id/scores` | Bảng điểm chi tiết lớp bộ môn |
+| `POST` | `/teacher/assignments/:assignment_id/score-columns` | Thêm cột điểm mới (chọn hệ số) |
+| `PUT` | `/teacher/assignments/:assignment_id/scores` | Lưu điểm hàng loạt + tính lại ĐTB |
+| `GET` | `/portal/parent` | Cổng phụ huynh: danh sách con liên kết với tài khoản |
+| `GET` | `/portal/parent/students/:student_id` | Bảng điểm + nhận xét của con được chọn |
+| `GET` | `/portal/student` | Cổng học sinh: bảng điểm + nhận xét cá nhân |
 
 ---
 
@@ -79,6 +105,37 @@
   - [POST /students](#post-students)
   - [GET /students/:id](#get-studentsid)
   - [PUT /students/:id](#put-studentsid)
+- [Classes](#classes)
+  - [GET /classes](#get-classes)
+  - [POST /classes](#post-classes)
+  - [GET /classes/:id](#get-classesid)
+  - [PUT /classes/:id](#put-classesid)
+  - [GET /classes/available-teachers](#get-classesavailable-teachers)
+- [Class Students](#class-students)
+  - [GET /classes/:id/students](#get-classesidstudents)
+  - [GET /classes/:id/available-students](#get-classesidavailable-students)
+  - [POST /classes/:id/students](#post-classesidstudents)
+  - [DELETE /classes/:id/students/:student_id](#delete-classesidstudentsstudent_id)
+- [Subject Assignments](#subject-assignments)
+  - [GET /classes/:id/assignments](#get-classesidassignments)
+  - [POST /classes/:id/assignments](#post-classesidassignments)
+  - [PUT /classes/:id/assignments/:assignment_id](#put-classesidassignmentsassignment_id)
+  - [DELETE /classes/:id/assignments/:assignment_id](#delete-classesidassignmentsassignment_id)
+- [Teacher Dashboard](#teacher-dashboard)
+  - [GET /teacher/dashboard](#get-teacherdashboard)
+  - [GET /teacher/homeroom/:class_id/students](#get-teacherhomeroomclass_idstudents)
+  - [GET /teacher/homeroom/:class_id/score-overview](#get-teacherhomeroomclass_idscore-overview)
+  - [GET /teacher/homeroom/:class_id/students/:student_id/score-detail](#get-teacherhomeroomclass_idstudentsstudent_idscore-detail)
+  - [GET /teacher/homeroom/:class_id/students/:student_id/comments](#get-teacherhomeroomclass_idstudentsstudent_idcomments)
+  - [POST /teacher/homeroom/:class_id/students/:student_id/comments](#post-teacherhomeroomclass_idstudentsstudent_idcomments)
+  - [PUT /teacher/homeroom/:class_id/comments/:comment_id](#put-teacherhomeroomclass_idcommentscomment_id)
+  - [GET /teacher/assignments/:assignment_id/scores](#get-teacherassignmentsassignment_idscores)
+  - [POST /teacher/assignments/:assignment_id/score-columns](#post-teacherassignmentsassignment_idscore-columns)
+  - [PUT /teacher/assignments/:assignment_id/scores](#put-teacherassignmentsassignment_idscores)
+- [Portal — Phụ huynh & Học sinh](#portal--phụ-huynh--học-sinh)
+  - [GET /portal/parent](#get-portalparent)
+  - [GET /portal/parent/students/:student_id](#get-portalparentstudentsstudent_id)
+  - [GET /portal/student](#get-portalstudent)
 
 ---
 
@@ -1683,6 +1740,978 @@ Cập nhật thông tin cơ bản của học sinh. Không thể thay đổi ema
   "success": true,
   "message": "Cập nhật học sinh thành công",
   "data": { "id": "7f22c1af-...", "..." }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy học sinh phù hợp" }
+```
+
+---
+
+## Classes
+
+> **FR-007: Quản lý lớp học**
+> Actor: `admin_school` — `school_id` lấy từ JWT.
+
+---
+
+### GET /classes
+
+Lấy danh sách lớp học của trường. Có thể lọc theo năm học và tìm kiếm theo tên lớp.
+
+**Query Parameters**
+
+| Tham số | Kiểu | Mô tả |
+|---------|------|-------|
+| `academic_year_id` | string (uuid) | Lọc theo năm học |
+| `search` | string | Tìm theo tên lớp (case-insensitive) |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách lớp học thành công",
+  "data": [
+    {
+      "id": "uuid",
+      "name": "10A1",
+      "academic_year_id": "uuid",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z",
+      "academic_year": { "id": "uuid", "name": "2025-2026" },
+      "homeroom_teacher": { "id": "uuid", "full_name": "Nguyễn Văn A", "teacher_code": "GV001" }
+    }
+  ]
+}
+```
+
+---
+
+### POST /classes
+
+Tạo lớp học mới.
+
+**Request Body**
+
+```json
+{
+  "academic_year_id": "uuid",
+  "name": "10A1",
+  "homeroom_teacher_id": "uuid"
+}
+```
+
+**Validation Rules**
+
+| Trường | Rule |
+|--------|------|
+| `academic_year_id` | Bắt buộc; phải thuộc trường của admin |
+| `name` | Bắt buộc; không được trùng trong cùng năm học (BR-007-01) |
+| `homeroom_teacher_id` | Bắt buộc; giáo viên chưa là GVCN lớp khác trong năm học (BR-007-02) |
+
+**Response 201 – Tạo thành công**
+```json
+{
+  "success": true,
+  "message": "Tạo lớp học thành công",
+  "data": { "id": "uuid", "name": "10A1", "..." }
+}
+```
+
+**Response 409 – Trùng tên lớp**
+```json
+{ "success": false, "message": "Tên lớp đã tồn tại trong năm học này" }
+```
+
+**Response 409 – Giáo viên đã là GVCN lớp khác**
+```json
+{ "success": false, "message": "Giáo viên này đã là chủ nhiệm lớp khác" }
+```
+
+**Response 422 – Lỗi validation**
+```json
+{
+  "success": false,
+  "message": "Vui lòng kiểm tra lại thông tin",
+  "errors": {
+    "name": ["Vui lòng nhập tên lớp"],
+    "homeroom_teacher_id": ["Vui lòng chọn giáo viên chủ nhiệm"]
+  }
+}
+```
+
+---
+
+### GET /classes/:id
+
+Lấy chi tiết một lớp học.
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin lớp học thành công",
+  "data": {
+    "id": "uuid",
+    "name": "10A1",
+    "academic_year_id": "uuid",
+    "academic_year": { "id": "uuid", "name": "2025-2026" },
+    "homeroom_teacher": { "id": "uuid", "full_name": "Nguyễn Văn A", "teacher_code": "GV001" }
+  }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+---
+
+### PUT /classes/:id
+
+Cập nhật tên lớp và/hoặc giáo viên chủ nhiệm.
+
+**Request Body** (tất cả các trường đều không bắt buộc)
+
+```json
+{
+  "name": "10A2",
+  "homeroom_teacher_id": "uuid"
+}
+```
+
+**Response 200 – Cập nhật thành công**
+```json
+{
+  "success": true,
+  "message": "Cập nhật lớp học thành công",
+  "data": { "id": "uuid", "name": "10A2", "..." }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+**Response 409**
+```json
+{ "success": false, "message": "Tên lớp đã tồn tại trong năm học này" }
+```
+
+---
+
+### GET /classes/available-teachers
+
+Lấy danh sách giáo viên chưa được gán làm GVCN cho bất kỳ lớp nào trong năm học (BR-007-03). Dùng khi tạo hoặc chỉnh sửa lớp để populate dropdown chọn GVCN.
+
+**Query Parameters**
+
+| Tham số | Kiểu | Bắt buộc | Mô tả |
+|---------|------|----------|-------|
+| `academic_year_id` | string (uuid) | Có | Năm học cần kiểm tra |
+| `exclude_class_id` | string (uuid) | Không | Bỏ qua lớp này khi kiểm tra (dùng khi edit) |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách giáo viên khả dụng thành công",
+  "data": [
+    { "id": "uuid", "full_name": "Trần Thị B", "teacher_code": "GV002" }
+  ]
+}
+```
+
+**Response 400 – Thiếu academic_year_id**
+```json
+{ "success": false, "message": "Vui lòng chọn năm học" }
+```
+
+---
+
+## Class Students
+
+> **FR-008** – Quản lý danh sách học sinh trong lớp
+> **Role yêu cầu:** `admin_school`
+> **Business Rules:**
+> - **BR-008-01:** 1 học sinh chỉ thuộc 1 lớp / năm học (enforce ở DB: `UNIQUE(academic_year_id, student_id)`)
+> - **BR-008-02:** Chỉ thêm được học sinh có `study_status = 'studying'`
+> - **BR-008-03:** Popup chỉ hiện học sinh studying và chưa có lớp trong năm học (`/available-students`)
+
+---
+
+### GET /classes/:id/students
+
+Lấy danh sách học sinh đang thuộc lớp.
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách học sinh trong lớp thành công",
+  "data": [
+    {
+      "id": "uuid",
+      "created_at": "2025-09-01T00:00:00.000Z",
+      "student": {
+        "id": "uuid",
+        "student_code": "NXO20250001",
+        "full_name": "Nguyễn Văn An",
+        "date_of_birth": "2010-05-15T00:00:00.000Z",
+        "gender": "male",
+        "study_status": "studying"
+      }
+    }
+  ]
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+---
+
+### GET /classes/:id/available-students
+
+Lấy danh sách học sinh khả dụng để thêm vào lớp (BR-008-02, BR-008-03).
+
+Chỉ trả về học sinh:
+- Thuộc trường (từ JWT)
+- Có `study_status = 'studying'`
+- Chưa thuộc lớp nào trong cùng năm học
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách học sinh khả dụng thành công",
+  "data": [
+    {
+      "id": "uuid",
+      "student_code": "NXO20250002",
+      "full_name": "Trần Thị Bình",
+      "date_of_birth": "2010-08-20T00:00:00.000Z",
+      "gender": "female",
+      "study_status": "studying"
+    }
+  ]
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+---
+
+### POST /classes/:id/students
+
+Thêm một hoặc nhiều học sinh vào lớp (batch).
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+
+**Request Body**
+
+| Field | Type | Bắt buộc | Mô tả |
+|-------|------|----------|-------|
+| `student_ids` | `string[]` | Có | Danh sách ID học sinh cần thêm (ít nhất 1) |
+
+```json
+{
+  "student_ids": ["uuid-1", "uuid-2"]
+}
+```
+
+**Response 201 – Thêm thành công** (trả về danh sách học sinh trong lớp sau khi thêm)
+```json
+{
+  "success": true,
+  "message": "Thêm học sinh vào lớp thành công",
+  "data": [ { "id": "uuid", "created_at": "...", "student": { "..." } } ]
+}
+```
+
+**Response 404 – Học sinh không tồn tại**
+```json
+{ "success": false, "message": "Không tìm thấy học sinh phù hợp" }
+```
+
+**Response 409 – BR-008-01: Học sinh đã có lớp trong năm học**
+```json
+{ "success": false, "message": "Học sinh đã thuộc một lớp trong năm học này" }
+```
+
+**Response 409 – BR-008-02: Học sinh không đang học**
+```json
+{ "success": false, "message": "Chỉ thêm được học sinh có trạng thái \"Đang học\"" }
+```
+
+**Response 422 – Lỗi validation**
+```json
+{
+  "success": false,
+  "message": "Vui lòng kiểm tra lại thông tin",
+  "errors": {
+    "student_ids": ["Vui lòng chọn ít nhất 1 học sinh"]
+  }
+}
+```
+
+---
+
+### DELETE /classes/:id/students/:student_id
+
+Xóa một học sinh khỏi lớp.
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+| `student_id` | `string` (UUID) | ID học sinh |
+
+**Response 200 – Xóa thành công**
+```json
+{
+  "success": true,
+  "message": "Xóa học sinh khỏi lớp thành công",
+  "data": null
+}
+```
+
+**Response 404 – Lớp không tồn tại**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+**Response 404 – Học sinh không thuộc lớp**
+```json
+{ "success": false, "message": "Học sinh không thuộc lớp này" }
+```
+
+---
+
+## Subject Assignments
+
+> **FR-009** – Phân công giáo viên bộ môn cho lớp học
+> **Role yêu cầu:** `admin_school`
+> **Business Rules:**
+> - **BR-009-01:** Mỗi lớp chỉ có 1 giáo viên phụ trách cho mỗi môn học — `(class_id, subject_id)` unique (application-level)
+> - Môn học phải thuộc cùng năm học với lớp
+> - Giáo viên phải thuộc cùng trường với admin
+
+---
+
+### GET /classes/:id/assignments
+
+Lấy danh sách phân công giáo viên bộ môn của lớp.
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách phân công thành công",
+  "data": [
+    {
+      "id": "uuid",
+      "created_at": "2025-09-01T00:00:00.000Z",
+      "updated_at": "2025-09-01T00:00:00.000Z",
+      "subject": { "id": "uuid", "name": "Toán" },
+      "teacher": { "id": "uuid", "full_name": "Nguyễn Văn A", "teacher_code": "GV001" }
+    }
+  ]
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy lớp học phù hợp" }
+```
+
+---
+
+### POST /classes/:id/assignments
+
+Tạo phân công mới (gán giáo viên bộ môn cho một môn học trong lớp).
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+
+**Request Body**
+
+| Field | Type | Bắt buộc | Mô tả |
+|-------|------|----------|-------|
+| `subject_id` | `string` (UUID) | Có | ID môn học (phải thuộc năm học của lớp) |
+| `teacher_id` | `string` (UUID) | Có | ID giáo viên (phải thuộc trường) |
+
+```json
+{
+  "subject_id": "uuid",
+  "teacher_id": "uuid"
+}
+```
+
+**Response 201 – Tạo thành công**
+```json
+{
+  "success": true,
+  "message": "Tạo phân công thành công",
+  "data": {
+    "id": "uuid",
+    "subject": { "id": "uuid", "name": "Toán" },
+    "teacher": { "id": "uuid", "full_name": "Nguyễn Văn A", "teacher_code": "GV001" }
+  }
+}
+```
+
+**Response 404 – Môn học không thuộc năm học của lớp**
+```json
+{ "success": false, "message": "Môn học không thuộc năm học của lớp này" }
+```
+
+**Response 404 – Giáo viên không tồn tại**
+```json
+{ "success": false, "message": "Không tìm thấy giáo viên phù hợp" }
+```
+
+**Response 409 – BR-009-01: Môn học đã có giáo viên phụ trách**
+```json
+{ "success": false, "message": "Môn học này đã có giáo viên phụ trách trong lớp" }
+```
+
+**Response 422 – Lỗi validation**
+```json
+{
+  "success": false,
+  "message": "Vui lòng kiểm tra lại thông tin",
+  "errors": {
+    "subject_id": ["Vui lòng chọn môn học"],
+    "teacher_id": ["Vui lòng chọn giáo viên"]
+  }
+}
+```
+
+---
+
+### PUT /classes/:id/assignments/:assignment_id
+
+Cập nhật giáo viên phụ trách cho một phân công (thay đổi teacher).
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+| `assignment_id` | `string` (UUID) | ID phân công |
+
+**Request Body**
+
+| Field | Type | Bắt buộc | Mô tả |
+|-------|------|----------|-------|
+| `teacher_id` | `string` (UUID) | Có | ID giáo viên mới |
+
+```json
+{ "teacher_id": "uuid" }
+```
+
+**Response 200 – Cập nhật thành công**
+```json
+{
+  "success": true,
+  "message": "Cập nhật phân công thành công",
+  "data": { "id": "uuid", "subject": { "..." }, "teacher": { "..." } }
+}
+```
+
+**Response 404 – Phân công không tồn tại**
+```json
+{ "success": false, "message": "Không tìm thấy phân công phù hợp" }
+```
+
+---
+
+### DELETE /classes/:id/assignments/:assignment_id
+
+Xóa một phân công giáo viên bộ môn.
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `id` | `string` (UUID) | ID lớp học |
+| `assignment_id` | `string` (UUID) | ID phân công |
+
+**Response 200 – Xóa thành công**
+```json
+{
+  "success": true,
+  "message": "Xóa phân công thành công",
+  "data": null
+}
+```
+
+**Response 404 – Phân công không tồn tại**
+```json
+{ "success": false, "message": "Không tìm thấy phân công phù hợp" }
+```
+
+---
+
+## Teacher Dashboard
+
+> **Actor**: Giáo viên (role `teacher`)
+> **Auth**: Bearer JWT (role `teacher`)
+> **FR**: FR-010 đến FR-015
+
+---
+
+### GET /teacher/dashboard
+
+**FR-010**: Lấy dashboard giáo viên — danh sách lớp chủ nhiệm và lớp bộ môn trong năm học đang diễn ra.
+
+**BR-010-01**: Chỉ hiển thị lớp trong năm học có trạng thái `in_progress`.
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin dashboard thành công",
+  "data": {
+    "homeroom_classes": [
+      {
+        "id": "uuid",
+        "name": "10A1",
+        "academic_year": { "id": "uuid", "name": "2025-2026" },
+        "_count": { "class_students": 35 }
+      }
+    ],
+    "subject_assignments": [
+      {
+        "id": "uuid",
+        "class": { "id": "uuid", "name": "10A2", "academic_year": { "id": "uuid", "name": "2025-2026" } },
+        "subject": { "id": "uuid", "name": "Toán" }
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /teacher/homeroom/:class_id/students
+
+**FR-012**: Lấy danh sách học sinh lớp chủ nhiệm kèm thông tin đầy đủ (bao gồm phụ huynh).
+
+**BR-012-01**: GVCN chỉ xem được học sinh trong lớp mình chủ nhiệm.
+
+**Path Parameters**
+
+| Parameter | Type | Mô tả |
+|-----------|------|-------|
+| `class_id` | string UUID | ID lớp học |
+
+**Response 200** — Mảng StudentInfo: id, student_code, full_name, date_of_birth, address, gender, study_status, user (id, email), parent (id, father_name, father_occupation, father_date_of_birth, mother_name, mother_occupation, mother_date_of_birth, phone, user).
+
+**Response 403**
+```json
+{ "success": false, "message": "Bạn không phải giáo viên chủ nhiệm của lớp này" }
+```
+
+---
+
+### GET /teacher/homeroom/:class_id/score-overview
+
+**FR-011**: Bảng điểm tổng hợp (GVCN view) — ĐTB từng môn của tất cả học sinh.
+
+**BR-011-01**: GVCN chỉ xem, không chỉnh sửa.
+**BR-015-01**: ĐTB = Tổng(điểm × hệ số) / Tổng hệ số.
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy bảng điểm tổng hợp thành công",
+  "data": {
+    "class": { "id": "uuid", "name": "10A1", "academic_year": { "id": "uuid", "name": "2025-2026", "status": "in_progress" } },
+    "subjects": [ { "id": "uuid", "name": "Toán" } ],
+    "students": [
+      { "id": "uuid", "full_name": "Nguyễn Văn A", "student_code": "TH012025001", "averages": { "subject-uuid": "8.50" } }
+    ]
+  }
+}
+```
+
+---
+
+### GET /teacher/homeroom/:class_id/students/:student_id/score-detail
+
+**FR-011**: Bảng điểm chi tiết của một học sinh (tất cả môn, cột điểm, hệ số, ĐTB).
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin chi tiết thành công",
+  "data": {
+    "student": { "id": "uuid", "full_name": "Nguyễn Văn A", "student_code": "TH012025001" },
+    "subjects": [
+      {
+        "subject": { "id": "uuid", "name": "Toán" },
+        "columns": [ { "id": "uuid", "coefficient": 1, "order": 1, "value": "8.50" } ],
+        "average": "8.50"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /teacher/homeroom/:class_id/students/:student_id/comments
+
+**FR-013**: Lấy danh sách nhận xét của học sinh (mới nhất trước — BR-013-07).
+
+**Response 200** — Mảng Comment: id, content, scheduled_at, status (scheduled/sent), created_at, updated_at, student (id, full_name).
+
+---
+
+### POST /teacher/homeroom/:class_id/students/:student_id/comments
+
+**FR-013**: Tạo nhận xét mới.
+
+**BR-013-01**: Trạng thái mặc định `scheduled`.
+**BR-013-09**: Không tạo khi năm học kết thúc.
+**VR-013-03**: Thời gian gửi phải ở tương lai.
+
+**Request Body**
+
+| Trường | Type | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `content` | string | Có | Nội dung nhận xét |
+| `scheduled_at` | string ISO 8601 | Có | Thời gian gửi (phải ở tương lai) |
+
+**Response 201** — Comment object mới tạo.
+
+**Response 400**
+```json
+{ "success": false, "message": "Năm học đã kết thúc, không thể thêm hoặc chỉnh sửa nhận xét" }
+```
+
+---
+
+### PUT /teacher/homeroom/:class_id/comments/:comment_id
+
+**FR-013**: Cập nhật nhận xét (chỉ khi `status = scheduled`).
+
+**BR-013-02/06**: Chỉ chỉnh sửa khi còn `scheduled`; đã gửi thì không cho.
+
+**Request Body** (tất cả optional): `content` (string), `scheduled_at` (ISO 8601, phải ở tương lai).
+
+**Response 200** — Comment object đã cập nhật.
+
+**Response 400**
+```json
+{ "success": false, "message": "Nhận xét đã gửi không thể chỉnh sửa" }
+```
+
+---
+
+### GET /teacher/assignments/:assignment_id/scores
+
+**FR-014**: Lấy bảng điểm chi tiết của phân công bộ môn.
+
+**BR-014-01**: GVBM chỉ quản lý điểm lớp và môn mình được phân công.
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy bảng điểm thành công",
+  "data": {
+    "assignment": {
+      "id": "uuid",
+      "class": { "id": "uuid", "name": "10A1", "academic_year": { "id": "uuid", "name": "2025-2026", "status": "in_progress" } },
+      "subject": { "id": "uuid", "name": "Toán" },
+      "year_status": "in_progress"
+    },
+    "score_columns": [ { "id": "uuid", "coefficient": 1, "order": 1 } ],
+    "students": [
+      { "id": "uuid", "full_name": "Nguyễn Văn A", "student_code": "TH012025001", "scores": { "col-uuid": "8.50" }, "average": "8.50" }
+    ]
+  }
+}
+```
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy phân công này" }
+```
+
+---
+
+### POST /teacher/assignments/:assignment_id/score-columns
+
+**FR-014**: Thêm cột điểm mới với hệ số.
+
+**BR-014-05/06**: Chọn hệ số khi thêm; không thêm khi năm học kết thúc.
+
+**Request Body**
+
+| Trường | Type | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `coefficient` | number (int ≥ 1) | Có | Hệ số cột điểm |
+
+**Response 201**
+```json
+{
+  "success": true,
+  "message": "Thêm cột điểm thành công",
+  "data": { "id": "uuid", "coefficient": 2, "order": 3 }
+}
+```
+
+---
+
+### PUT /teacher/assignments/:assignment_id/scores
+
+**FR-014 + FR-015**: Lưu điểm hàng loạt + tính lại ĐTB.
+
+**BR-014-03/04**: Inline editing → nhấn "Lưu" → lưu + tính ĐTB.
+**BR-015-01**: ĐTB = Tổng(điểm × hệ số) / Tổng hệ số (chỉ tính cột đã nhập, null được bỏ qua).
+**BR-014-06**: Không lưu khi năm học đã kết thúc.
+
+**Request Body**
+```json
+{
+  "scores": [
+    { "student_id": "uuid", "score_column_id": "uuid", "value": 8.5 },
+    { "student_id": "uuid", "score_column_id": "uuid", "value": null }
+  ]
+}
+```
+
+**Response 200** — Bảng điểm đầy đủ sau khi cập nhật (cùng cấu trúc GET /scores).
+
+**Response 400**
+```json
+{ "success": false, "message": "Năm học đã kết thúc, không thể chỉnh sửa điểm" }
+```
+
+---
+
+## Portal — Phụ huynh & Học sinh
+
+> **Actor**: `parent` (FR-016), `student` (FR-017)
+> Tất cả endpoints yêu cầu JWT Bearer token với role tương ứng.
+> Chỉ được **xem**, không được chỉnh sửa bất kỳ thông tin nào.
+
+---
+
+### GET /portal/parent
+
+**FR-016** — Lấy danh sách con liên kết với tài khoản phụ huynh.
+
+**BR-016-01**: Phụ huynh chỉ xem được thông tin của các con liên kết.
+**BR-016-04/05**: FE dùng danh sách này để auto-select (1 con) hoặc hiển thị bộ chọn (nhiều con).
+
+**Headers**
+```
+Authorization: Bearer <token>   (role: parent)
+```
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin cổng phụ huynh thành công",
+  "data": {
+    "children": [
+      {
+        "id": "uuid",
+        "student_code": "TH012025001",
+        "full_name": "Nguyễn Văn A",
+        "date_of_birth": "2010-01-15T00:00:00.000Z",
+        "gender": "male",
+        "study_status": "studying",
+        "current_class": {
+          "id": "uuid",
+          "name": "10A1",
+          "academic_year": { "id": "uuid", "name": "2025-2026", "status": "in_progress" }
+        }
+      }
+    ]
+  }
+}
+```
+
+> `current_class` là lớp gần nhất của học sinh. Có thể `null` nếu chưa xếp lớp.
+
+**Response 404**
+```json
+{ "success": false, "message": "Không tìm thấy thông tin phụ huynh" }
+```
+
+---
+
+### GET /portal/parent/students/:student_id
+
+**FR-016** — Lấy bảng điểm và nhận xét của con được chọn.
+
+**BR-016-01**: Nếu `student_id` không thuộc phụ huynh → 403.
+**BR-016-03**: Chỉ được xem, không được chỉnh sửa.
+**BR-016-02**: Chỉ trả về nhận xét đã gửi (`status = 'sent'`).
+
+**Headers**
+```
+Authorization: Bearer <token>   (role: parent)
+```
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin học sinh thành công",
+  "data": {
+    "student": {
+      "id": "uuid",
+      "student_code": "TH012025001",
+      "full_name": "Nguyễn Văn A",
+      "date_of_birth": "2010-01-15T00:00:00.000Z",
+      "gender": "male",
+      "study_status": "studying"
+    },
+    "scores": [
+      {
+        "class": {
+          "id": "uuid",
+          "name": "10A1",
+          "academic_year": { "id": "uuid", "name": "2025-2026", "status": "in_progress" }
+        },
+        "subjects": [
+          {
+            "subject": { "id": "uuid", "name": "Toán" },
+            "columns": [
+              { "id": "uuid", "coefficient": 1, "order": 1, "value": "8.50" },
+              { "id": "uuid", "coefficient": 2, "order": 2, "value": "9.00" }
+            ],
+            "average": "8.83"
+          }
+        ]
+      }
+    ],
+    "comments": [
+      {
+        "id": "uuid",
+        "content": "Học sinh có tinh thần học tập tốt.",
+        "scheduled_at": "2025-10-01T07:00:00.000Z",
+        "status": "sent",
+        "created_at": "2025-09-25T10:00:00.000Z",
+        "class": { "id": "uuid", "name": "10A1" },
+        "teacher": { "id": "uuid", "full_name": "Trần Thị B" }
+      }
+    ]
+  }
+}
+```
+
+> `scores` sắp xếp theo năm học mới nhất trước. `average` là `null` nếu chưa có điểm nào.
+
+**Response 403**
+```json
+{ "success": false, "message": "Học sinh này không thuộc tài khoản phụ huynh của bạn" }
+```
+
+---
+
+### GET /portal/student
+
+**FR-017** — Học sinh xem bảng điểm và nhận xét cá nhân.
+
+**BR-017-01**: Chỉ xem được thông tin của chính mình.
+**BR-017-03**: Chỉ được xem, không được chỉnh sửa.
+**BR-017-02**: Chỉ trả về nhận xét đã gửi (`status = 'sent'`).
+
+**Headers**
+```
+Authorization: Bearer <token>   (role: student)
+```
+
+**Response 200**
+```json
+{
+  "success": true,
+  "message": "Lấy thông tin cổng học sinh thành công",
+  "data": {
+    "student": {
+      "id": "uuid",
+      "student_code": "TH012025001",
+      "full_name": "Nguyễn Văn A",
+      "date_of_birth": "2010-01-15T00:00:00.000Z",
+      "gender": "male",
+      "study_status": "studying"
+    },
+    "scores": [
+      {
+        "class": {
+          "id": "uuid",
+          "name": "10A1",
+          "academic_year": { "id": "uuid", "name": "2025-2026", "status": "in_progress" }
+        },
+        "subjects": [
+          {
+            "subject": { "id": "uuid", "name": "Toán" },
+            "columns": [
+              { "id": "uuid", "coefficient": 1, "order": 1, "value": "8.50" }
+            ],
+            "average": "8.50"
+          }
+        ]
+      }
+    ],
+    "comments": [
+      {
+        "id": "uuid",
+        "content": "Học sinh có tinh thần học tập tốt.",
+        "scheduled_at": "2025-10-01T07:00:00.000Z",
+        "status": "sent",
+        "created_at": "2025-09-25T10:00:00.000Z",
+        "class": { "id": "uuid", "name": "10A1" },
+        "teacher": { "id": "uuid", "full_name": "Trần Thị B" }
+      }
+    ]
+  }
 }
 ```
 
