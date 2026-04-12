@@ -326,16 +326,29 @@ Admin School quản lý danh sách môn học theo từng năm học. Mỗi năm
 **Actor:** Admin School
 
 **Business Flow:**
+
+*Thêm / sửa / xóa môn học:*
 1. Admin School chọn năm học
 2. Truy cập chức năng quản lý môn học
 3. Thêm / sửa / xóa môn học cho năm học đó
 4. Hệ thống validate và lưu
 
+*Sao chép danh sách môn học:*
+1. Admin School đang xem danh sách môn học của một năm học
+2. Nhấn nút "Sao chép danh sách môn học"
+3. Hệ thống hiển thị popup danh sách năm học đang diễn ra và sắp diễn ra (trừ năm đang xem)
+4. Admin School chọn năm học đích
+5. Nếu năm học đích đã có môn học → hiển thị cảnh báo "Năm học này đã có dữ liệu, có thay đổi nữa hay không?"
+   - Chọn "Có": ghi đè toàn bộ danh sách môn học ở năm đích
+   - Chọn "Không": hủy thao tác
+6. Nếu năm học đích chưa có môn học → thực hiện sao chép ngay
+7. Hiển thị thông báo "Tạo dữ liệu thành công cho năm học {tên năm học}"
+
 **Input Data:**
 
 | Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
 |---|---|---|---|
-| Tên môn học | String | Có | Tên môn học (BRD không liệt kê chi tiết các trường khác) |
+| Tên môn học | String | Có | Tên môn học |
 | Năm học | Reference | Có | Liên kết đến năm học |
 
 **Output Data:**
@@ -358,15 +371,18 @@ Admin School quản lý danh sách môn học theo từng năm học. Mỗi năm
 | STT | Rule |
 |---|---|
 | BR-004-01 | Mỗi năm học có danh sách môn học riêng biệt |
-
-> **Lưu ý:** BRD không đề cập chi tiết các trường dữ liệu của môn học (ngoài việc mỗi năm học có danh sách riêng). Cũng không đề cập quy tắc trùng tên môn học trong cùng năm học.
+| BR-004-01b | Không thể thêm môn học vào năm học có trạng thái `completed` |
+| BR-004-02 | Tên môn học phải unique trong cùng năm học (case-insensitive) |
+| BR-004-03 | Không thể xóa môn học đã có phân công giảng dạy |
+| BR-004-04 | Sao chép danh sách môn học: chỉ cho phép sang năm học `in_progress` hoặc `preparing`; nếu năm đích đã có phân công giảng dạy thì không thể ghi đè |
 
 **Exception Handling:**
 
 | STT | Exception | Xử lý |
 |---|---|---|
-| EX-004-01 | Xóa môn học đã được phân công cho lớp | BRD không đề cập |
-| EX-004-02 | Trùng tên môn học trong cùng năm học | BRD không đề cập |
+| EX-004-01 | Xóa môn học đã được phân công cho lớp | Hiển thị lỗi, không cho xóa (BR-004-03) |
+| EX-004-02 | Trùng tên môn học trong cùng năm học | Hiển thị lỗi, không cho tạo |
+| EX-004-03 | Sao chép sang năm đích đã có phân công | Hiển thị lỗi, không thực hiện ghi đè (BR-004-04) |
 
 ---
 
@@ -381,10 +397,11 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 
 *Thêm giáo viên:*
 1. Admin School chọn chức năng thêm giáo viên
-2. Nhập đầy đủ thông tin giáo viên
-3. Hệ thống validate dữ liệu (kiểm tra unique CCCD, mã số giáo viên)
-4. Hệ thống tạo tài khoản giáo viên với email và mật khẩu đã nhập
-5. Lưu thông tin và hiển thị thông báo thành công
+2. Nhập đầy đủ thông tin giáo viên (không có trường mật khẩu)
+3. Hệ thống validate dữ liệu (kiểm tra unique CCCD, mã số giáo viên, email)
+4. Hệ thống tự động tạo mật khẩu tạm thời ngẫu nhiên
+5. Hệ thống tạo tài khoản giáo viên và gửi email chứa mật khẩu tạm thời đến email giáo viên
+6. Lưu thông tin và hiển thị thông báo thành công
 
 *Xem danh sách giáo viên:*
 1. Admin School truy cập danh sách giáo viên
@@ -406,8 +423,7 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 | Mã số giáo viên | String | Có | Có | Mã định danh giáo viên |
 | Giới tính | Enum | Có | Không | Giới tính |
 | Trạng thái làm việc | Enum | Có | Không | Đang làm việc / Đã nghỉ |
-| Email | String (Email) | Có | Không | Email đăng nhập hệ thống |
-| Mật khẩu | String | Có | Không | Mật khẩu đăng nhập |
+| Email | String (Email) | Có | Không | Email đăng nhập — hệ thống tự gửi mật khẩu tạm thời đến địa chỉ này |
 
 **Output Data:**
 - Danh sách giáo viên (có trạng thái)
@@ -425,7 +441,6 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 | VR-005-06 | Mã số giáo viên không được để trống | Bắt buộc |
 | VR-005-07 | Mã số giáo viên phải duy nhất trong hệ thống | Unique constraint |
 | VR-005-08 | Email không được để trống và đúng định dạng | Bắt buộc |
-| VR-005-09 | Mật khẩu không được để trống | Bắt buộc |
 
 **Message Validation:**
 
@@ -440,7 +455,6 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 | MSG-005-07 | "Mã số giáo viên đã tồn tại trong hệ thống" | Mã số trùng |
 | MSG-005-08 | "Vui lòng nhập email" | Email để trống |
 | MSG-005-09 | "Email không đúng định dạng" | Email sai format |
-| MSG-005-10 | "Vui lòng nhập mật khẩu" | Mật khẩu để trống |
 
 **Business Rules:**
 
@@ -448,7 +462,8 @@ Admin School quản lý danh sách giáo viên trong trường, bao gồm thêm 
 |---|---|
 | BR-005-01 | CCCD phải là duy nhất (unique) trên toàn hệ thống |
 | BR-005-02 | Mã số giáo viên phải là duy nhất (unique) trên toàn hệ thống |
-| BR-005-03 | Giáo viên được tạo tài khoản đăng nhập bằng email và mật khẩu |
+| BR-005-03 | Giáo viên được tạo tài khoản đăng nhập bằng email; hệ thống tự sinh mật khẩu tạm thời và gửi qua email |
+| BR-005-04 | Admin School không nhập mật khẩu khi tạo giáo viên — mật khẩu tạm thời được tạo tự động (12 ký tự ngẫu nhiên) |
 
 > **Lưu ý:** BRD không đề cập các giá trị cụ thể của "Giới tính". Cũng không đề cập chức năng xóa giáo viên. **BRD không đề cập.**
 
@@ -627,6 +642,8 @@ Admin School quản lý danh sách lớp học theo năm học. Mỗi lớp có 
 | BR-007-01 | Không trùng tên lớp trong cùng năm học |
 | BR-007-02 | 1 giáo viên chỉ chủ nhiệm tối đa 1 lớp trong cùng năm học |
 | BR-007-03 | Giáo viên đã là GVCN sẽ không hiển thị trong danh sách chọn khi tạo/sửa lớp khác |
+| BR-007-04 | Chỉ được tạo lớp học trong năm học có trạng thái `in_progress` (đang diễn ra) hoặc `preparing` (sắp diễn ra). Không thể tạo lớp trong năm học `completed` |
+| BR-007-05 | Danh sách lớp học mặc định lọc theo năm học đang diễn ra (`in_progress`) khi vào trang |
 
 **Exception Handling:**
 
@@ -649,9 +666,10 @@ Trong chi tiết lớp học, có mục danh sách học sinh. Admin School thê
 1. Admin School truy cập chi tiết lớp học, xem mục danh sách học sinh
 2. Nhấn nút "Chỉnh sửa danh sách học sinh"
 3. Hệ thống hiển thị popup danh sách học sinh khả dụng (trạng thái "Đang học", chưa thuộc lớp nào trong năm học)
-4. Admin School tick checkbox chọn học sinh cần thêm
-5. Nhấn nút "Thêm vào lớp"
-6. Hệ thống lưu và cập nhật danh sách
+4. Admin School có thể tìm kiếm học sinh theo mã học sinh hoặc họ tên thông qua ô tìm kiếm phía trên danh sách (lọc phía client, không cần gọi API)
+5. Admin School tick checkbox chọn học sinh cần thêm
+6. Nhấn nút "Thêm vào lớp"
+7. Hệ thống lưu và cập nhật danh sách
 
 **Input Data:**
 
@@ -683,6 +701,7 @@ Trong chi tiết lớp học, có mục danh sách học sinh. Admin School thê
 | BR-008-01 | 1 học sinh chỉ thuộc 1 lớp trong cùng năm học |
 | BR-008-02 | Chỉ hiển thị học sinh có trạng thái "Đang học" trong popup |
 | BR-008-03 | Thêm học sinh thông qua giao diện popup với checkbox chọn nhiều, sau đó nhấn nút "Thêm vào lớp" |
+| BR-008-04 | Popup có ô tìm kiếm để lọc học sinh theo mã học sinh hoặc họ tên (client-side, không cần gọi API thêm) |
 
 **Exception Handling:**
 
@@ -817,7 +836,7 @@ Giáo viên chủ nhiệm xem bảng điểm trung bình tất cả các môn c�
 - Không có input (hệ thống hiển thị tự động)
 
 **Output Data:**
-- Bảng điểm trung bình các môn của tất cả học sinh trong lớp
+- Bảng điểm trung bình các môn của tất cả học sinh trong lớp (kèm cột Tổng ĐTB)
 - Bảng điểm chi tiết của từng học sinh (khi click xem chi tiết)
 
 **Validation Rules:**
@@ -833,6 +852,8 @@ Giáo viên chủ nhiệm xem bảng điểm trung bình tất cả các môn c�
 | BR-011-01 | GVCN chỉ xem bảng điểm, không chỉnh sửa điểm |
 | BR-011-02 | Bảng điểm hiển thị ĐTB tất cả các môn học của lớp |
 | BR-011-03 | Có nút xem bảng điểm chi tiết cho từng học sinh |
+| BR-011-04 | Bảng điểm tổng hợp có thêm cột "Tổng ĐTB" = trung bình cộng của ĐTB tất cả các môn học (chỉ tính các môn đã có ĐTB) |
+| BR-011-05 | Màu sắc hiển thị ĐTB: ≥ 8 → xanh lá, 5 ≤ ĐTB < 8 → cam, < 5 → đỏ (áp dụng cho cả ĐTB từng môn và Tổng ĐTB) |
 
 **Exception Handling:**
 
@@ -985,9 +1006,10 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 
 | Trường | Kiểu dữ liệu | Bắt buộc | Mô tả |
 |---|---|---|---|
-| Cột điểm | Object | Có | Cột điểm mới (kèm hệ số) |
-| Hệ số điểm | Number | Có | Hệ số của cột điểm |
-| Điểm | Number | Có | Giá trị điểm cho từng học sinh |
+| Cột điểm | Object | Có | Cột điểm mới (kèm hệ số và tên cột tuỳ chọn) |
+| Tên cột | String | Không | Tên cột điểm tuỳ chọn, tối đa 20 ký tự (VD: "Kiểm tra 15 phút", "Giữa kỳ") |
+| Hệ số điểm | Number | Có | Hệ số của cột điểm (1, 2 hoặc 3) |
+| Điểm | Number | Có | Giá trị điểm cho từng học sinh (0–10, hỗ trợ nhập dấu phẩy thập phân) |
 
 **Output Data:**
 - Bảng điểm chi tiết (các cột điểm + hệ số + ĐTB)
@@ -998,7 +1020,8 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 | STT | Rule | Mô tả |
 |---|---|---|
 | VR-014-01 | Phải chọn hệ số khi thêm cột điểm | Bắt buộc |
-| VR-014-02 | Điểm phải là số hợp lệ | BRD không đề cập thang điểm cụ thể |
+| VR-014-02 | Điểm phải là số hợp lệ trong khoảng 0–10 | Thang điểm 10 |
+| VR-014-03 | Tên cột không được vượt quá 20 ký tự | Tùy chọn nhưng có giới hạn độ dài |
 
 **Message Validation:**
 
@@ -1007,6 +1030,7 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 | MSG-014-01 | "Vui lòng chọn hệ số điểm" | Chưa chọn hệ số |
 | MSG-014-02 | "Điểm không hợp lệ" | Điểm nhập sai format |
 | MSG-014-03 | "Năm học đã kết thúc, không thể chỉnh sửa điểm" | Thao tác sửa điểm khi năm học đã kết thúc |
+| MSG-014-04 | "Tên cột không được vượt quá 20 ký tự" | Tên cột vượt giới hạn ký tự |
 
 **Business Rules:**
 
@@ -1016,10 +1040,12 @@ Tại dashboard, hiển thị danh sách lớp mà giáo viên phụ trách bộ
 | BR-014-02 | Mỗi cột điểm có hệ số riêng |
 | BR-014-03 | Chỉnh sửa điểm trực tiếp trên bảng (inline editing), sau đó nhấn nút "Lưu" |
 | BR-014-04 | Sau khi nhấn "Lưu", hệ thống lưu điểm và tính toán lại ĐTB |
-| BR-014-05 | Thêm cột điểm mới qua nút "Thêm điểm", chọn hệ số tại title cột |
+| BR-014-05 | Thêm cột điểm mới qua nút "Thêm cột điểm"; form thêm có trường tên cột (tuỳ chọn, tối đa 20 ký tự) và hệ số (bắt buộc). Header cột hiển thị tên cột nếu có, ngược lại hiển thị "Cột {số thứ tự}" |
 | BR-014-06 | Khi năm học ở trạng thái "Đã kết thúc": không được thêm cột điểm mới hoặc chỉnh sửa điểm thuộc năm học đó (BR-003-03) |
+| BR-014-07 | Điểm hỗ trợ nhập số thập phân bằng dấu phẩy (,) hoặc dấu chấm (.), hệ thống tự chuyển về định dạng số thập phân (VD: "7,5" → 7.5) |
+| BR-014-08 | Màu sắc hiển thị ĐTB tại cột ĐTB: ≥ 8 → xanh lá, 5 ≤ ĐTB < 8 → cam, < 5 → đỏ |
 
-> **Lưu ý:** BRD không đề cập: thang điểm (0-10 hay 0-100), các giá trị hệ số cụ thể (1, 2, 3...), số lượng cột điểm tối đa, cột điểm có tên không. **BRD không đề cập.**
+> **Lưu ý:** BRD không đề cập số lượng cột điểm tối đa.
 
 **Exception Handling:**
 

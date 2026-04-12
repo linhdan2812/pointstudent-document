@@ -58,7 +58,7 @@
 | `POST` | `/teacher/homeroom/:class_id/students/:student_id/comments` | Tạo nhận xét mới |
 | `PUT` | `/teacher/homeroom/:class_id/comments/:comment_id` | Cập nhật nhận xét (chỉ khi còn "Đã lên lịch") |
 | `GET` | `/teacher/assignments/:assignment_id/scores` | Bảng điểm chi tiết lớp bộ môn |
-| `POST` | `/teacher/assignments/:assignment_id/score-columns` | Thêm cột điểm mới (chọn hệ số) |
+| `POST` | `/teacher/assignments/:assignment_id/score-columns` | Thêm cột điểm mới (tên cột + hệ số) |
 | `PUT` | `/teacher/assignments/:assignment_id/scores` | Lưu điểm hàng loạt + tính lại ĐTB |
 | `GET` | `/portal/parent` | Cổng phụ huynh: danh sách con liên kết với tài khoản |
 | `GET` | `/portal/parent/students/:student_id` | Bảng điểm + nhận xét của con được chọn |
@@ -92,6 +92,7 @@
 - [Subjects](#subjects)
   - [GET /subjects](#get-subjects)
   - [POST /subjects](#post-subjects)
+  - [POST /subjects/copy](#post-subjectscopy)
   - [GET /subjects/:id](#get-subjectsid)
   - [PUT /subjects/:id](#put-subjectsid)
   - [DELETE /subjects/:id](#delete-subjectsid)
@@ -1117,6 +1118,56 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 
 ---
 
+### POST /subjects/copy
+
+> **FR-004** – Sao chép danh sách môn học từ một năm học sang năm học khác
+
+**Business Rules:**
+- Cả `from_year_id` và `to_year_id` phải thuộc trường của admin_school đang đăng nhập.
+- Năm học đích (`to_year_id`) không được có trạng thái `completed`.
+- Nếu năm học đích đã có môn học với phân công giảng dạy → lỗi 409.
+- Toàn bộ môn học hiện tại ở năm đích bị xóa và thay bằng danh sách môn học từ năm nguồn.
+
+**Request Body**
+
+| Field | Type | Bắt buộc | Mô tả |
+|-------|------|----------|-------|
+| `from_year_id` | `string` (UUID) | Có | ID năm học nguồn (sao chép từ) |
+| `to_year_id` | `string` (UUID) | Có | ID năm học đích (sao chép sang) |
+
+```json
+{
+  "from_year_id": "550e8400-e29b-41d4-a716-446655440000",
+  "to_year_id": "660e8400-e29b-41d4-a716-446655440001"
+}
+```
+
+**Response 200 – Sao chép thành công**
+```json
+{
+  "success": true,
+  "message": "Sao chép danh sách môn học thành công",
+  "data": { "count": 8 }
+}
+```
+
+**Response 404 – Năm học không tồn tại hoặc không thuộc trường**
+```json
+{ "success": false, "message": "Không tìm thấy năm học phù hợp" }
+```
+
+**Response 409 – Năm học đích đã kết thúc**
+```json
+{ "success": false, "message": "Không thể thêm môn học vào năm học đã kết thúc" }
+```
+
+**Response 409 – Năm học đích đã có phân công giảng dạy**
+```json
+{ "success": false, "message": "Không thể ghi đè vì năm học đích đã có phân công giảng dạy" }
+```
+
+---
+
 ### GET /subjects/:id
 
 > **FR-004** – Lấy chi tiết một môn học
@@ -1352,6 +1403,7 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 - `BR-005-01`: `citizen_id` phải unique **toàn hệ thống** (không chỉ trong trường).
 - `BR-005-02`: `teacher_code` phải unique **toàn hệ thống**.
 - `BR-005-03`: Tạo tài khoản `User` (role=`teacher`) và hồ sơ `Teacher` trong cùng một transaction (atomic).
+- `BR-005-04`: Mật khẩu được **tự động tạo ngẫu nhiên** bởi hệ thống và gửi đến email của giáo viên. Không nhận `password` từ client.
 - `work_status` mặc định là `active` nếu không truyền.
 
 **Request Body**
@@ -1365,8 +1417,7 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 | `teacher_code` | `string` | Có | Mã số giáo viên (VD: GV001) |
 | `gender` | `"male" \| "female" \| "other"` | Có | Giới tính |
 | `work_status` | `"active" \| "resigned"` | Không | Trạng thái làm việc (mặc định: `active`) |
-| `email` | `string` | Có | Email đăng nhập của giáo viên |
-| `password` | `string` | Có | Mật khẩu đăng nhập |
+| `email` | `string` | Có | Email đăng nhập — mật khẩu tạm thời sẽ được gửi đến địa chỉ này |
 
 ```json
 {
@@ -1377,8 +1428,7 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
   "teacher_code": "GV001",
   "gender": "male",
   "work_status": "active",
-  "email": "giaovien@truong.edu.vn",
-  "password": "matkhau123"
+  "email": "giaovien@truong.edu.vn"
 }
 ```
 
@@ -1427,8 +1477,7 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
     "full_name": ["Vui lòng nhập họ tên"],
     "date_of_birth": ["Vui lòng nhập ngày sinh"],
     "gender": ["Vui lòng chọn giới tính"],
-    "email": ["Vui lòng nhập email"],
-    "password": ["Vui lòng nhập mật khẩu"]
+    "email": ["Vui lòng nhập email"]
   }
 }
 ```
@@ -1448,7 +1497,6 @@ Xác nhận token từ email và cập nhật mật khẩu mới cho tài khoả
 | `gender` | Bắt buộc, một trong `male/female/other` | "Vui lòng chọn giới tính" |
 | `email` | Bắt buộc | "Vui lòng nhập email" |
 | `email` | Đúng định dạng email | "Email không đúng định dạng" |
-| `password` | Bắt buộc | "Vui lòng nhập mật khẩu" |
 
 ---
 
@@ -1793,6 +1841,9 @@ Lấy danh sách lớp học của trường. Có thể lọc theo năm học v�
 
 Tạo lớp học mới.
 
+**Business Rules:**
+- `BR-007-04`: Chỉ được tạo lớp trong năm học có trạng thái `in_progress` hoặc `preparing`. Không thể tạo lớp trong năm học `completed`.
+
 **Request Body**
 
 ```json
@@ -1807,9 +1858,14 @@ Tạo lớp học mới.
 
 | Trường | Rule |
 |--------|------|
-| `academic_year_id` | Bắt buộc; phải thuộc trường của admin |
+| `academic_year_id` | Bắt buộc; phải thuộc trường của admin; không được là năm học `completed` (BR-007-04) |
 | `name` | Bắt buộc; không được trùng trong cùng năm học (BR-007-01) |
 | `homeroom_teacher_id` | Bắt buộc; giáo viên chưa là GVCN lớp khác trong năm học (BR-007-02) |
+
+**Response 409 – Năm học đã kết thúc**
+```json
+{ "success": false, "message": "Không thể tạo lớp học trong năm học đã kết thúc" }
+```
 
 **Response 201 – Tạo thành công**
 ```json
@@ -2483,7 +2539,7 @@ Xóa một phân công giáo viên bộ môn.
 
 ### POST /teacher/assignments/:assignment_id/score-columns
 
-**FR-014**: Thêm cột điểm mới với hệ số.
+**FR-014**: Thêm cột điểm mới với tên cột và hệ số.
 
 **BR-014-05/06**: Chọn hệ số khi thêm; không thêm khi năm học kết thúc.
 
@@ -2492,13 +2548,14 @@ Xóa một phân công giáo viên bộ môn.
 | Trường | Type | Bắt buộc | Mô tả |
 |--------|------|----------|-------|
 | `coefficient` | number (int ≥ 1) | Có | Hệ số cột điểm |
+| `label` | string (max 20 ký tự) | Không | Tên cột tùy chỉnh (VD: "Kiểm tra 15 phút"). Nếu không truyền, header hiển thị "Cột {order}" |
 
 **Response 201**
 ```json
 {
   "success": true,
   "message": "Thêm cột điểm thành công",
-  "data": { "id": "uuid", "coefficient": 2, "order": 3 }
+  "data": { "id": "uuid", "coefficient": 2, "order": 3, "label": "Giữa kỳ" }
 }
 ```
 
